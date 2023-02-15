@@ -10,9 +10,9 @@ public class Main {
     public static String ANSI_BLACK = "\u001B[30m";
     public static String ANSI_BLACKBG = "\u001B[40m";
 
+    public static int[][] CheckerBoard = new int[8][8]; //makes board available to GUI class as well as Main class
 
     public static void main(String[] args) throws NumberFormatException{
-        int[][] CheckerBoard = new int[8][8];
 
         //credits
         System.out.println("Checkers, written in Java, made by WhitetailAni");
@@ -20,11 +20,11 @@ public class Main {
 
 
         //explain what each piece is
-	    System.out.println(ANSI_WHITE + "0 = empty space" + ANSI_RESET);
-	    System.out.println(ANSI_BLACK + "1 = black piece" + ANSI_RESET);
-	    System.out.println(ANSI_RED + "2 = red piece" + ANSI_RESET);
-	    System.out.println(ANSI_BLACKBG + "3 = black king" + ANSI_RESET);
-	    System.out.println(ANSI_REDBG + ANSI_BLACK + "4 = red king" + ANSI_RESET);
+        System.out.println(ANSI_WHITE + "0 = empty space" + ANSI_RESET);
+        System.out.println(ANSI_BLACK + "1 = black piece" + ANSI_RESET);
+        System.out.println(ANSI_RED + "2 = red piece" + ANSI_RESET);
+        System.out.println(ANSI_BLACKBG + "3 = black king" + ANSI_RESET);
+        System.out.println(ANSI_REDBG + ANSI_BLACK + "4 = red king" + ANSI_RESET);
 
         //setup board, topside
         for (int i = 0; i < 3; i++) {
@@ -132,7 +132,7 @@ public class Main {
                             if (
                                     !(xSel <= 1) //the piece is not in a corner (fixes out of bounds)
                                             && //AND
-                                    (CheckerBoard[xSel - 1][ySel + 1] == 2 || CheckerBoard[xSel - 1][ySel + 1] == 4) //there is a jumpable piece that is RED's
+                                            (CheckerBoard[xSel - 1][ySel + 1] == 2 || CheckerBoard[xSel - 1][ySel + 1] == 4) //there is a jumpable piece that is RED's
                                             && //AND
                                             (CheckerBoard[xSel - 2][ySel + 2] == 0 || cheatModeBlack)) //the destination if the piece is jumped is open
                             {
