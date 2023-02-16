@@ -12,7 +12,7 @@ public class Main {
 
     public static int[][] CheckerBoard = new int[8][8]; //makes board available to GUI class as well as Main class
 
-    public static void main(String[] args) throws NumberFormatException{
+    public static void backend(String[] args) throws NumberFormatException{
 
         //credits
         System.out.println("Checkers, written in Java, made by WhitetailAni");
