@@ -1,6 +1,6 @@
 import java.util.concurrent.Executor;
 
-public class GUI extends Main{
+public class GUI extends backend{
 
     public static void main(String[] args) {
 
@@ -39,11 +39,22 @@ public class GUI extends Main{
                 yGuiPos += 75;
                 xGuiPos = -37.5;
                 altColor = !altColor;
-
-                StdDraw.setPenColor(StdDraw.BLACK);
-                StdDraw.filledCircle(37.5,37.5,34);
             }
 
+            //update state of board
+            for (int i = 0; i < CheckerBoard.length; i++) {
+                for (int j = 0; j < CheckerBoard[i].length; j++) {
+                    if(CheckerBoard[i][j] == 1){
+                        blackReg(xConversionTherapy(j),yConversionTherapy(i));
+                    } else if(CheckerBoard[i][j] == 2){
+                        redReg(xConversionTherapy(j),yConversionTherapy(i));
+                    } else if(CheckerBoard[i][j] == 3){
+                        blackKing(xConversionTherapy(j),yConversionTherapy(i));
+                    }if(CheckerBoard[i][j] == 4){
+                        redKing(xConversionTherapy(j),yConversionTherapy(i));
+                    }
+                }
+            }
 
             //new frame
             StdDraw.show();
@@ -51,14 +62,40 @@ public class GUI extends Main{
             StdDraw.clear();
         }
     }
+    static double xConversionTherapy(int xIn){ //converts x-coordinates of CheckerBoard to x-coordinates for the GUI
+        double xOut = 37.5 + (75*xIn);
+        return xOut;
+    }
+    static double yConversionTherapy(int yIn){ //converts y-coordinates of CheckerBoard to y-coordinates for the GUI
+        double yOut = 562.5 - (75*yIn);
+        return yOut;
+    }
+    static void blackReg(double xIn, double yIn){ //draws a regular black checker
+        StdDraw.setPenColor(StdDraw.BLACK);
+        StdDraw.filledCircle(xIn,yIn,34);
+    }
+    static void redReg(double xIn, double yIn){ //draws a regular red checker
+        StdDraw.setPenColor(StdDraw.RED);
+        StdDraw.filledCircle(xIn,yIn,34);
+    }
+    static void blackKing(double xIn, double yIn){ //draws a black king checker
+        StdDraw.setPenColor(StdDraw.BLACK);
+        StdDraw.filledCircle(xIn,yIn,34);
+        StdDraw.picture(xIn,yIn,"src/bking.png"); //white outline of crown
+    }
+    static void redKing(double xIn, double yIn){ //draws a red king checker
+        StdDraw.setPenColor(StdDraw.RED);
+        StdDraw.filledCircle(xIn,yIn+1,34);
+        StdDraw.picture(xIn,yIn+1,"src/rking.png"); //black outline of crown
+    }
     public static void backendRun(){
-        Thread backendGo = new Thread(new Runnable() {
+        Thread backendRun = new Thread(new Runnable() {
             public void run() {
                 String[] dummy = new String[3]; //because backend depends on an input string[]
-                Main.backend(dummy);
+                backend.backend(dummy);
             }
         }
         );
-        backendGo.start();
+        backendRun.start(); //runs backend (this will be replaced it's a PoC for now
     }
 }
