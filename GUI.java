@@ -1,4 +1,4 @@
-import java.util.concurrent.Executor;
+import java.awt.*;
 
 public class GUI extends backend{
 
@@ -8,14 +8,19 @@ public class GUI extends backend{
         double timeElapsed = 0.017; //each frame is 0.017 seconds long
         StdDraw.setPenRadius(0.05);
         StdDraw.setPenColor(StdDraw.RED);
-        StdDraw.setCanvasSize(600, 600);
-        StdDraw.setScale(0, 600);
+        StdDraw.setCanvasSize(600, 655);
+        StdDraw.setXscale(0, 600);
+        StdDraw.setYscale(0, 655);
         StdDraw.enableDoubleBuffering();
 
-        //draw board
+        //resources for drawing board
         boolean altColor = false; //switches colors when drawing rectangles
 
-        backendRun();
+        //resources for title bar
+        Font title = new Font("Sans Serif", Font.BOLD, 30);
+        Font captured = new Font("Sans Serif", Font.BOLD, 14);
+
+        backendRun(); //runs the backend of checkers
 
         while (true) {
 
@@ -40,10 +45,41 @@ public class GUI extends backend{
                 xGuiPos = -37.5;
                 altColor = !altColor;
             }
+            StdDraw.setPenColor(StdDraw.BLACK);
+            StdDraw.filledRectangle(300, 602.5, 300, 2.5);
+            StdDraw.setPenColor(StdDraw.PRINCETON_ORANGE);
+            StdDraw.filledRectangle(300,630,300,25);
 
-            //update state of board
-            for (int i = 0; i < CheckerBoard.length; i++) {
-                for (int j = 0; j < CheckerBoard[i].length; j++) {
+            //display current turn
+            StdDraw.setFont(title);
+            if(blackTurn){
+                StdDraw.setPenColor(StdDraw.BLACK);
+                StdDraw.text(300,625,"It is BLACK's turn");
+            } else {
+                StdDraw.setPenColor(StdDraw.RED);
+                StdDraw.text(300,625,"It is RED's turn");
+            }
+
+            //display captured pieces
+            StdDraw.setFont(captured);
+            StdDraw.setPenColor(StdDraw.BLACK);
+            StdDraw.text(90,635, "Black has captured");
+            if(blackCaptured == 1){
+                StdDraw.text(90, 621, "1 piece");
+            } else {
+                StdDraw.text(90, 621, blackCaptured + " pieces");
+            }
+            StdDraw.setPenColor(StdDraw.RED);
+            StdDraw.text(510,635, "Red has captured");
+            if(redCaptured == 1) {
+                StdDraw.text(510, 621, blackCaptured + " pieces");
+            } else {
+                StdDraw.text(510, 621, redCaptured + " pieces");
+            }
+
+            //update state of checkerboard
+            for (int i=0; i<CheckerBoard.length; i++) {
+                for (int j=0; j<CheckerBoard[i].length; j++) {
                     if(CheckerBoard[i][j] == 1){
                         blackReg(xConversionTherapy(j),yConversionTherapy(i));
                     } else if(CheckerBoard[i][j] == 2){
@@ -55,6 +91,7 @@ public class GUI extends backend{
                     }
                 }
             }
+
 
             //new frame
             StdDraw.show();
@@ -68,6 +105,14 @@ public class GUI extends backend{
     }
     static double yConversionTherapy(int yIn){ //converts y-coordinates of CheckerBoard to y-coordinates for the GUI
         double yOut = 562.5 - (75*yIn);
+        return yOut;
+    }
+    static int xTherapyConversion(double xIn){
+        int xOut = (int)((0.0133333*(xIn + 0.1)) - 0.5); //this equation converts coordinates back. the +0.1 is used to fix that the equation rounds each number down 1
+        return xOut;
+    }
+    static int yTherapyConversion(double yIn){
+        int yOut = (int)(7.5 - (0.0133333*yIn));
         return yOut;
     }
     static void blackReg(double xIn, double yIn){ //draws a regular black checker

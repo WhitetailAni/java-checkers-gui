@@ -10,7 +10,22 @@ public class backend {
     public static String ANSI_BLACK = "\u001B[30m";
     public static String ANSI_BLACKBG = "\u001B[40m";
 
+    //the int[][] array that stores checker positions
     public static int[][] CheckerBoard = new int[8][8]; //makes board available to GUI class as well as Main class
+
+    //x coordinates for moving pieces
+    public static int xSel = 0; //x-coord of selected piece. Set to 0 by default due to multiturn logic
+    public static int ySel = 0; //y-coord of selected piece
+    public static int xDest = 0; //x-coord of destination (only used if not jumping a piece)
+    public static int yDest = 0; //y-coord of destination (only used if not jumping a piece)
+
+    //determine whose turn it is
+    public static boolean blackTurn = true;
+    public static boolean redTurn = false;
+
+    //log number of pieces captured
+    public static int blackCaptured = 0;
+    public static int redCaptured = 0;
 
     public static void main(String[] args) throws NumberFormatException{
 
@@ -67,28 +82,20 @@ public class backend {
         CheckerBoard[2][7] = 2;
         CheckerBoard[6][7] = 1;
 
-        //determine whose turn it is
-        boolean blackTurn = true;
-        boolean redTurn = false;
+        //debug stuff
         boolean cheatModeBlack = false;
         boolean cheatModeRed = false;
 
         //checkers managing
-        int xSel = 0; //x-coord of selected piece. Set to 0 by default due to multiturn logic
-        int ySel = 0; //y-coord of selected piece
-        int xDest = 0; //x-coord of destination (only used if not jumping a piece)
-        int yDest = 0; //y-coord of destination (only used if not jumping a piece)
-        int misclick; //used in case of misinput (prevent game softlocks)
-        boolean multiturn; //used to determine if the player can take another turn or not (only used if a piece was jumped
-
-        //log number of pieces captured
-        int blackCaptured = 0;
-        int redCaptured = 0;
+        int misclick = 0; //used in case of misinput (prevent game softlocks)
+        boolean multiturn; //used to determine if the player can take another turn or not (only used if a piece was jumped)
+        boolean errorCheck = false;
 
         Scanner coordIn = new Scanner(System.in); //this Scanner handles all input during the game
         while(true) {
             String intCoordIn;
             if (blackTurn) {
+                errorCheck = false;
                 multiturn = false;
                 printBoard(CheckerBoard, false);
                 System.out.println("It is " + ANSI_BLACK + "BLACK's" + ANSI_RESET + " turn");
@@ -127,7 +134,7 @@ public class backend {
                         }
                     }
                     pieceMoveBlack:
-                    while (true) { // destination select loop
+                    while (true) { //pieceMoveBlack, destination select and jump loop
                         if (ySel <= 1) {
                             if (
                                     !(xSel <= 1) //the piece is not in a corner (fixes out of bounds)
@@ -266,7 +273,8 @@ public class backend {
                                     System.out.println("Select new piece? '1' for yes, '0' for no");
                                     misclick = Integer.parseInt(coordIn.nextLine().substring(0, 1));
                                     if (misclick == 1) {
-                                        System.out.println("Input the coordinates of the piece you would like to move, format 'x,y'");
+                                        errorCheck = true;
+                                        /*System.out.println("Input the coordinates of the piece you would like to move, format 'x,y'");
                                         intCoordIn = coordIn.nextLine();
                                         xSel = Integer.parseInt(intCoordIn.substring(0, 1));
                                         ySel = Integer.parseInt(intCoordIn.substring(2, 3));
@@ -277,7 +285,7 @@ public class backend {
                                             System.out.println("You cannot move red's pieces");
                                         } else if (CheckerBoard[xSel][ySel] == 0) {
                                             System.out.println("You cannot move an empty space");
-                                        }
+                                        }*/
                                     }
                                 }
                                 catch(NumberFormatException | StringIndexOutOfBoundsException e){
