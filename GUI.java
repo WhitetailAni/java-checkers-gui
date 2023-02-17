@@ -92,10 +92,10 @@ public class GUI extends backend{
         Thread backendRun = new Thread(new Runnable() {
             public void run() {
                 String[] dummy = new String[3]; //because backend depends on an input string[]
-                backend.backend(dummy);
+                backend.main(dummy);
             }
         }
         );
-        backendRun.start(); //runs backend (this will be replaced it's a PoC for now
+        backendRun.start(); //runs backend (this will be replaced as it doesn't let GUI interact with backend. just passive for now)
     }
 }
