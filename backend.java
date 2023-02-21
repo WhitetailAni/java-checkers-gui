@@ -9,6 +9,8 @@ public class backend {
     public static String ANSI_WHITE = "\u001B[37m";
     public static String ANSI_BLACK = "\u001B[30m";
     public static String ANSI_BLACKBG = "\u001B[40m";
+    public static String ANSI_BLUE = "\u001B[34m";
+    public static String ANSI_BLUEBG = "\u001B[44m";
 
     //the int[][] array that stores checker positions
     public static int[][] CheckerBoard = new int[8][8]; //makes board available to GUI class as well as Main class
@@ -27,7 +29,10 @@ public class backend {
     public static int blackCaptured = 0;
     public static int redCaptured = 0;
 
-    public static void main(String[] args) throws NumberFormatException{
+    //tells backend to proceed (xSel and ySel have been set)
+    public static boolean proceed = false;
+
+    public static void main(String[] args) throws NumberFormatException {
 
         //credits
         System.out.println("Checkers, written in Java, made by WhitetailAni");
@@ -36,9 +41,9 @@ public class backend {
 
         //explain what each piece is
         System.out.println(ANSI_WHITE + "0 = empty space" + ANSI_RESET);
-        System.out.println(ANSI_BLACK + "1 = black piece" + ANSI_RESET);
+        System.out.println(ANSI_BLUE + "1 = black piece" + ANSI_RESET);
         System.out.println(ANSI_RED + "2 = red piece" + ANSI_RESET);
-        System.out.println(ANSI_BLACKBG + "3 = black king" + ANSI_RESET);
+        System.out.println(ANSI_BLACKBG + ANSI_BLUE + "3 = black king" + ANSI_RESET);
         System.out.println(ANSI_REDBG + ANSI_BLACK + "4 = red king" + ANSI_RESET);
 
         //setup board, topside
@@ -89,7 +94,7 @@ public class backend {
         //checkers managing
         int misclick = 0; //used in case of misinput (prevent game softlocks)
         boolean multiturn; //used to determine if the player can take another turn or not (only used if a piece was jumped)
-        boolean errorCheck = false;
+        boolean errorCheck = true;
 
         Scanner coordIn = new Scanner(System.in); //this Scanner handles all input during the game
         while(true) {
@@ -98,11 +103,11 @@ public class backend {
                 errorCheck = false;
                 multiturn = false;
                 printBoard(CheckerBoard, false);
-                System.out.println("It is " + ANSI_BLACK + "BLACK's" + ANSI_RESET + " turn");
+                System.out.println("It is " + ANSI_BLUE + "BLACK's" + ANSI_RESET + " turn");
                 masterBlack:
-                while (true) {
+                while (true) { //masterBlack
                     pieceSelectBlack:
-                    while (true) { //piece select loop
+                    while (true) { //pieceSelectBlack
                         //get coordinates of desired piece
                         if(multiturn) {
                             if (xSel == 0 && CheckerBoard[xSel][ySel] != 3) {
@@ -112,10 +117,10 @@ public class backend {
                             break pieceSelectBlack;
                         } else {
                             System.out.println("Input the coordinates of the piece you would like to move, format 'x,y'");
-                            intCoordIn = coordIn.nextLine();
+                            //intCoordIn = coordIn.nextLine();
                             try{
-                                xSel = Integer.parseInt(intCoordIn.substring(0, 1));
-                                ySel = Integer.parseInt(intCoordIn.substring(2, 3));
+                                //xSel = Integer.parseInt(intCoordIn.substring(0, 1));
+                               // ySel = Integer.parseInt(intCoordIn.substring(2, 3));
                                 //check if coords are invalid
                                 if (xSel == 6 && ySel == 9) {
                                     System.out.println("Cheat mode toggled");
@@ -250,55 +255,43 @@ public class backend {
                             System.out.println("You can only input coordinates in the format 'x,y'!");
                         }
 
-                        if ((CheckerBoard[xSel][ySel] == 3 && //if the piece is a king AND
+                        if (((((CheckerBoard[xSel][ySel] == 3 && //if the piece is a king AND
                                 ((xDest == xSel - 1 || xDest == xSel + 1) && //destination x-coord is +/- 1 of the piece's x-coord AND
                                         (yDest == ySel + 1 || yDest == ySel - 1))) //destination y-coord is +/- 1 of the piece's y-coord
                                 || // OR
                                 (xDest == xSel - 1 && //destination x-coord is -1 of piece's x-coord (piece is moving towards the other side) AND
-                                        (yDest == ySel + 1 || yDest == ySel - 1)) //destination y-coord is +/- 1 of piece's y-coord
+                                        (yDest == ySel + 1 || yDest == ySel - 1)))) //destination y-coord is +/- 1 of piece's y-coord
+                                && // AND
+                                CheckerBoard[xDest][yDest] == 0) //destination is empty
                                 || // OR
                                 cheatModeBlack) //cheatMode is enabled (skip destination checks)
                         {
-                            if (CheckerBoard[xDest][yDest] == 0) {
-                                CheckerBoard[xDest][yDest] = CheckerBoard[xSel][ySel];
-                                CheckerBoard[xSel][ySel] = 0;
-                                if (xDest == 0 && CheckerBoard[xDest][yDest] != 3) {
-                                    System.out.println("Black piece at " + xDest + "," + yDest + " is now a king, and can move any direction");
-                                    CheckerBoard[xDest][yDest] = 3;
-                                }
-                                break pieceMoveBlack;
-                            } else {
-                                try {
-                                    System.out.println("The destination coordinates must be empty");
-                                    System.out.println("Select new piece? '1' for yes, '0' for no");
-                                    misclick = Integer.parseInt(coordIn.nextLine().substring(0, 1));
-                                    if (misclick == 1) {
-                                        errorCheck = true;
-                                        /*System.out.println("Input the coordinates of the piece you would like to move, format 'x,y'");
-                                        intCoordIn = coordIn.nextLine();
-                                        xSel = Integer.parseInt(intCoordIn.substring(0, 1));
-                                        ySel = Integer.parseInt(intCoordIn.substring(2, 3));
-                                        if (xSel == 69 && ySel == 420) {
-                                            System.out.println("Cheat mode toggled");
-                                            cheatModeBlack = !cheatModeBlack;
-                                        } else if (CheckerBoard[xSel][ySel] == 2 || CheckerBoard[xSel][ySel] == 4) {
-                                            System.out.println("You cannot move red's pieces");
-                                        } else if (CheckerBoard[xSel][ySel] == 0) {
-                                            System.out.println("You cannot move an empty space");
-                                        }*/
-                                    }
-                                }
-                                catch(NumberFormatException | StringIndexOutOfBoundsException e){
-                                    System.out.println("You can only input coordinates in the format 'x,y'!");
-                                    //actually, the character in between the first and second numbers can be whatever you want
-                                    //dont tell anyone
+                            CheckerBoard[xDest][yDest] = CheckerBoard[xSel][ySel];
+                            CheckerBoard[xSel][ySel] = 0;
+                            if (xDest == 0 && CheckerBoard[xDest][yDest] != 3) {
+                                System.out.println("Black piece at " + xDest + "," + yDest + " is now a king, and can move any direction");
+                                CheckerBoard[xDest][yDest] = 3;
+                            }
+                            break pieceMoveBlack;
+                        } else {
+                            try {
+                                System.out.println("Invalid movement");
+                                System.out.println("Select new piece? '1' for yes, '0' for no");
+                                misclick = Integer.parseInt(coordIn.nextLine().substring(0, 1));
+                                if (misclick == 1) {
+                                    errorCheck = true;
+                                    break pieceMoveBlack;
                                 }
                             }
-                        } else {
-                            System.out.println("Checkers pieces cannot teleport!");
+                            catch(NumberFormatException | StringIndexOutOfBoundsException e){
+                                System.out.println("You can only input coordinates in the format 'x,y'!");
+                                //actually, the character in between the first and second numbers can be whatever you want
+                                //dont tell anyone
+                            }
                         }
                     }
-                    if(!multiturn){
+                    System.out.println(errorCheck);
+                    if(multiturn == false && errorCheck == false){
                         break masterBlack;
                     }
                 }
@@ -309,8 +302,10 @@ public class backend {
                     break;
                 }
             } else if (redTurn) {
+                errorCheck = false;
                 multiturn = false;
                 printBoard(CheckerBoard, false);
+                System.out.println("It is " + ANSI_RED + "RED's" + ANSI_RESET + " turn");
                 masterRed:
                 while (true) {
                     pieceSelectRed:
@@ -322,7 +317,6 @@ public class backend {
                             }
                             break pieceSelectRed;
                         } else {
-                            System.out.println("It is " + ANSI_RED + "RED's" + ANSI_RESET + " turn");
                             System.out.println("Input the coordinates of the piece you would like to move, format 'x,y'");
                             intCoordIn = coordIn.nextLine();
                             try {
@@ -358,7 +352,7 @@ public class backend {
                                 xSel = xSel + 2;
                                 ySel = ySel + 2;
                                 break pieceMoveRed;
-                            } else if (((CheckerBoard[xSel - 1][ySel + 1] == 1 || CheckerBoard[xSel - 1][ySel + 1] == 3) && CheckerBoard[xSel - 2][ySel + 2] == 0) && CheckerBoard[xSel][ySel] == 4) {
+                            } else if ((xSel > 1) && ((CheckerBoard[xSel - 1][ySel + 1] == 1 || CheckerBoard[xSel - 1][ySel + 1] == 3) && CheckerBoard[xSel - 2][ySel + 2] == 0) && CheckerBoard[xSel][ySel] == 4) {
                                 System.out.println("You must make a forced jump");
                                 CheckerBoard[xSel - 2][ySel + 2] = CheckerBoard[xSel][ySel];
                                 CheckerBoard[xSel - 1][ySel + 1] = 0;
@@ -435,7 +429,7 @@ public class backend {
                                 break pieceMoveRed;
                             }
                         }
-                        if(multiturn){
+                        if (multiturn) {
                             break masterRed;
                         }
                         System.out.println("Input the coordinates of the spot you would like to move to, format 'x,y'");
@@ -443,62 +437,45 @@ public class backend {
                         try {
                             xDest = Integer.parseInt(intCoordIn.substring(0, 1));
                             yDest = Integer.parseInt(intCoordIn.substring(2, 3));
-                        }
-                        catch(NumberFormatException | StringIndexOutOfBoundsException e){
+                        } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
                             System.out.println("You can only input coordinates in the format 'x,y'!");
                         }
-                        if ((CheckerBoard[xSel][ySel] == 4 && //if the piece is a king AND
+                        if ((((CheckerBoard[xSel][ySel] == 4 && //if the piece is a king AND
                                 ((xDest == xSel - 1 || xDest == xSel + 1) && //destination x-coord is +/- 1 of the piece's x-coord AND
                                         (yDest == ySel + 1 || yDest == ySel - 1))) //destination y-coord is +/- 1 of the piece's y-coord
                                 || // OR
                                 (xDest == xSel + 1 && //destination x-coord is +1 of piece's x-coord (piece is moving towards the other side) AND
-                                        (yDest == ySel + 1 || yDest == ySel - 1)) //destination y-coord is +/- 1 of piece's y-coord
+                                        (yDest == ySel + 1 || yDest == ySel - 1))) //destination y-coord is +/- 1 of piece's y-coord
+                                && // AND
+                                CheckerBoard[xDest][yDest] == 0) //destination is empty
                                 || // OR
                                 cheatModeRed) //cheatMode is enabled (skip destination checks)
                         {
-                            if (CheckerBoard[xDest][yDest] == 0) {
-                                CheckerBoard[xDest][yDest] = CheckerBoard[xSel][ySel];
-                                CheckerBoard[xSel][ySel] = 0;
-                                if (xDest == 7) {
-                                    System.out.println("Red piece at " + xDest + "," + yDest + " is now a king, and can move any direction");
-                                    CheckerBoard[xDest][yDest] = 4;
-                                }
-                                break;
-                            } else {
-                                try {
-                                    System.out.println("The destination coordinates must be empty");
-                                    System.out.println("Select new piece? '1' for yes, '0' for no");
-                                    misclick = Integer.parseInt(coordIn.nextLine().substring(0, 1));
-                                    if (misclick == 1) {
-                                        System.out.println("Input the coordinates of the piece you would like to move, format 'x,y'");
-                                        intCoordIn = coordIn.nextLine();
-                                        xSel = Integer.parseInt(intCoordIn.substring(0, 1));
-                                        ySel = Integer.parseInt(intCoordIn.substring(2, 3));
-
-                                        if (xSel == 420 && ySel == 69) {
-                                            System.out.println("Cheat mode toggled");
-                                            cheatModeRed = !cheatModeRed;
-                                        } else if (CheckerBoard[xSel][ySel] == 1 || CheckerBoard[xSel][ySel] == 3) {
-                                            System.out.println("You cannot move black's pieces");
-                                        } else if (CheckerBoard[xSel][ySel] == 0) {
-                                            System.out.println("You cannot move an empty space");
-                                        }
-                                    }
-                                }
-                                catch(NumberFormatException | StringIndexOutOfBoundsException e){
-                                    System.out.println("You can only input coordinates in the format 'x,y'!");
-                                }
+                            if (xDest == 7) {
+                                System.out.println("Red piece at " + xDest + "," + yDest + " is now a king, and can move any direction");
+                                CheckerBoard[xDest][yDest] = 4;
                             }
+                            break pieceMoveRed;
                         } else {
-                            System.out.println("Checkers pieces cannot teleport!");
+                            try {
+                                System.out.println("The destination coordinates must be empty");
+                                System.out.println("Select new piece? '1' for yes, '0' for no");
+                                misclick = Integer.parseInt(coordIn.nextLine().substring(0, 1));
+                                if (misclick == 1) {
+                                    errorCheck = true;
+                                    break pieceMoveRed;
+                                }
+                            } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
+                                System.out.println("You can only input coordinates in the format 'x,y'!");
+                            }
                         }
                     }
-                    redTurn = false;
-                    blackTurn = true;
-                    if(!multiturn){
+                    if(multiturn == false && errorCheck == false){
                         break masterRed;
                     }
                 }
+                redTurn = false;
+                blackTurn = true;
             }
             if(blackWon(CheckerBoard) || redWon(CheckerBoard)){ //if game is won, break loop
                 break;
@@ -563,11 +540,11 @@ public class backend {
             if(CheckerBoard[0][i] == 0){
                 System.out.print(ANSI_WHITE + CheckerBoard[0][i] + ANSI_RESET);
             } else if(CheckerBoard[0][i] == 1){
-                System.out.print(ANSI_BLACK + CheckerBoard[0][i] + ANSI_RESET);
+                System.out.print(ANSI_BLUE + CheckerBoard[0][i] + ANSI_RESET);
             } else if(CheckerBoard[0][i] == 2){
                 System.out.print(ANSI_RED + CheckerBoard[0][i] + ANSI_RESET);
             } else if(CheckerBoard[0][i] == 3){
-                System.out.print(ANSI_BLACKBG + CheckerBoard[0][i] + ANSI_RESET);
+                System.out.print(ANSI_BLACKBG + ANSI_BLUE + CheckerBoard[0][i] + ANSI_RESET);
             } else if(CheckerBoard[0][i] == 4){
                 System.out.print(ANSI_REDBG + ANSI_BLACK + CheckerBoard[0][i] + ANSI_RESET);
             }
@@ -581,11 +558,11 @@ public class backend {
             if(CheckerBoard[1][i] == 0){
                 System.out.print(ANSI_WHITE + CheckerBoard[1][i] + ANSI_RESET);
             } else if(CheckerBoard[1][i] == 1){
-                System.out.print(ANSI_BLACK + CheckerBoard[1][i] + ANSI_RESET);
+                System.out.print(ANSI_BLUE + CheckerBoard[1][i] + ANSI_RESET);
             } else if(CheckerBoard[1][i] == 2){
                 System.out.print(ANSI_RED + CheckerBoard[1][i] + ANSI_RESET);
             } else if(CheckerBoard[1][i] == 3){
-                System.out.print(ANSI_BLACKBG + CheckerBoard[1][i] + ANSI_RESET);
+                System.out.print(ANSI_BLACKBG + ANSI_BLUE + CheckerBoard[1][i] + ANSI_RESET);
             } else if(CheckerBoard[1][i] == 4){
                 System.out.print(ANSI_REDBG + ANSI_BLACK + CheckerBoard[1][i] + ANSI_RESET);
             }
@@ -598,11 +575,11 @@ public class backend {
             if(CheckerBoard[2][i] == 0){
                 System.out.print(ANSI_WHITE + CheckerBoard[2][i] + ANSI_RESET);
             } else if(CheckerBoard[2][i] == 1){
-                System.out.print(ANSI_BLACK + CheckerBoard[2][i] + ANSI_RESET);
+                System.out.print(ANSI_BLUE + CheckerBoard[2][i] + ANSI_RESET);
             } else if(CheckerBoard[2][i] == 2){
                 System.out.print(ANSI_RED + CheckerBoard[2][i] + ANSI_RESET);
             } else if(CheckerBoard[2][i] == 3){
-                System.out.print(ANSI_BLACKBG + CheckerBoard[2][i] + ANSI_RESET);
+                System.out.print(ANSI_BLACKBG + ANSI_BLUE + CheckerBoard[2][i] + ANSI_RESET);
             } else if(CheckerBoard[2][i] == 4){
                 System.out.print(ANSI_REDBG + ANSI_BLACK + CheckerBoard[2][i] + ANSI_RESET);
             }
@@ -615,11 +592,11 @@ public class backend {
             if(CheckerBoard[3][i] == 0){
                 System.out.print(ANSI_WHITE + CheckerBoard[3][i] + ANSI_RESET);
             } else if(CheckerBoard[3][i] == 1){
-                System.out.print(ANSI_BLACK + CheckerBoard[3][i] + ANSI_RESET);
+                System.out.print(ANSI_BLUE + CheckerBoard[3][i] + ANSI_RESET);
             } else if(CheckerBoard[3][i] == 2){
                 System.out.print(ANSI_RED + CheckerBoard[3][i] + ANSI_RESET);
             } else if(CheckerBoard[3][i] == 3){
-                System.out.print(ANSI_BLACKBG + CheckerBoard[3][i] + ANSI_RESET);
+                System.out.print(ANSI_BLACKBG + ANSI_BLUE + CheckerBoard[3][i] + ANSI_RESET);
             } else if(CheckerBoard[3][i] == 4){
                 System.out.print(ANSI_REDBG + ANSI_BLACK + CheckerBoard[3][i] + ANSI_RESET);
             }
@@ -632,11 +609,11 @@ public class backend {
             if(CheckerBoard[4][i] == 0){
                 System.out.print(ANSI_WHITE + CheckerBoard[4][i] + ANSI_RESET);
             } else if(CheckerBoard[4][i] == 1){
-                System.out.print(ANSI_BLACK + CheckerBoard[4][i] + ANSI_RESET);
+                System.out.print(ANSI_BLUE + CheckerBoard[4][i] + ANSI_RESET);
             } else if(CheckerBoard[4][i] == 2){
                 System.out.print(ANSI_RED + CheckerBoard[4][i] + ANSI_RESET);
             } else if(CheckerBoard[4][i] == 3){
-                System.out.print(ANSI_BLACKBG + CheckerBoard[4][i] + ANSI_RESET);
+                System.out.print(ANSI_BLACKBG + ANSI_BLUE + CheckerBoard[4][i] + ANSI_RESET);
             } else if(CheckerBoard[4][i] == 4){
                 System.out.print(ANSI_REDBG + ANSI_BLACK + CheckerBoard[4][i] + ANSI_RESET);
             }
@@ -649,11 +626,11 @@ public class backend {
             if(CheckerBoard[5][i] == 0){
                 System.out.print(ANSI_WHITE + CheckerBoard[5][i] + ANSI_RESET);
             } else if(CheckerBoard[5][i] == 1){
-                System.out.print(ANSI_BLACK + CheckerBoard[5][i] + ANSI_RESET);
+                System.out.print(ANSI_BLUE + CheckerBoard[5][i] + ANSI_RESET);
             } else if(CheckerBoard[5][i] == 2){
                 System.out.print(ANSI_RED + CheckerBoard[5][i] + ANSI_RESET);
             } else if(CheckerBoard[5][i] == 3){
-                System.out.print(ANSI_BLACKBG + CheckerBoard[5][i] + ANSI_RESET);
+                System.out.print(ANSI_BLACKBG + ANSI_BLUE + CheckerBoard[5][i] + ANSI_RESET);
             } else if(CheckerBoard[5][i] == 4){
                 System.out.print(ANSI_REDBG + ANSI_BLACK + CheckerBoard[5][i] + ANSI_RESET);
             }
@@ -666,11 +643,11 @@ public class backend {
             if(CheckerBoard[6][i] == 0){
                 System.out.print(ANSI_WHITE + CheckerBoard[6][i] + ANSI_RESET);
             } else if(CheckerBoard[6][i] == 1){
-                System.out.print(ANSI_BLACK + CheckerBoard[6][i] + ANSI_RESET);
+                System.out.print(ANSI_BLUE + CheckerBoard[6][i] + ANSI_RESET);
             } else if(CheckerBoard[6][i] == 2){
                 System.out.print(ANSI_RED + CheckerBoard[6][i] + ANSI_RESET);
             } else if(CheckerBoard[6][i] == 3){
-                System.out.print(ANSI_BLACKBG + CheckerBoard[6][i] + ANSI_RESET);
+                System.out.print(ANSI_BLACKBG + ANSI_BLUE + CheckerBoard[6][i] + ANSI_RESET);
             } else if(CheckerBoard[6][i] == 4){
                 System.out.print(ANSI_REDBG + ANSI_BLACK + CheckerBoard[6][i] + ANSI_RESET);
             }
@@ -683,11 +660,11 @@ public class backend {
             if(CheckerBoard[7][i] == 0){
                 System.out.print(ANSI_WHITE + CheckerBoard[7][i] + ANSI_RESET);
             } else if(CheckerBoard[7][i] == 1){
-                System.out.print(ANSI_BLACK + CheckerBoard[7][i] + ANSI_RESET);
+                System.out.print(ANSI_BLUE + CheckerBoard[7][i] + ANSI_RESET);
             } else if(CheckerBoard[7][i] == 2){
                 System.out.print(ANSI_RED + CheckerBoard[7][i] + ANSI_RESET);
             } else if(CheckerBoard[7][i] == 3){
-                System.out.print(ANSI_BLACKBG + CheckerBoard[7][i] + ANSI_RESET);
+                System.out.print(ANSI_BLACKBG + ANSI_BLUE + CheckerBoard[7][i] + ANSI_RESET);
             } else if(CheckerBoard[7][i] == 4){
                 System.out.print(ANSI_REDBG + ANSI_BLACK + CheckerBoard[7][i] + ANSI_RESET);
             }

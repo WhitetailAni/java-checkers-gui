@@ -1,6 +1,6 @@
 import java.awt.*;
 
-public class GUI extends backend{
+public class GUI extends backend {
 
     public static void main(String[] args) {
 
@@ -27,6 +27,9 @@ public class GUI extends backend{
             //this has to be in the while loop
             double xGuiPos = -37.5;
             double yGuiPos = 37.5;
+
+            double mouseX = StdDraw.mouseX();
+            double mouseY = StdDraw.mouseY();
 
             StdDraw.setPenColor(StdDraw.RED);
             //set up board background
@@ -77,6 +80,18 @@ public class GUI extends backend{
                 StdDraw.text(510, 621, redCaptured + " pieces");
             }
 
+            /*if(StdDraw.isMousePressed()) {//current mouse coordinates
+                System.out.println("MouseX is at " + mouseY + " GUI standard, which is " + yTherapyConversion(mouseY) + " CLI standard");
+                System.out.println("MouseY is at " + mouseX + " GUI standard, which is " + xTherapyConversion(mouseX) + " CLI standard");
+            }*/
+
+            if(StdDraw.isMousePressed()) {
+                xSel = yTherapyConversion(mouseX);
+                ySel = xTherapyConversion(mouseY);
+                System.out.println(xSel + ", " + xTherapyConversion(mouseX));
+                System.out.println(ySel + ", " + yTherapyConversion(mouseY));
+            }
+
             //update state of checkerboard
             for (int i=0; i<CheckerBoard.length; i++) {
                 for (int j=0; j<CheckerBoard[i].length; j++) {
@@ -108,11 +123,11 @@ public class GUI extends backend{
         return yOut;
     }
     static int xTherapyConversion(double xIn){
-        int xOut = (int)((0.0133333*(xIn + 0.1)) - 0.5); //this equation converts coordinates back. the +0.1 is used to fix that the equation rounds each number down 1
+        int xOut = (int)((0.0133333*((xIn + 37.5) + 0.1)) - 0.5); //this equation converts coordinates back. the +0.1 is used to fix that the equation rounds each number down 1
         return xOut;
     }
     static int yTherapyConversion(double yIn){
-        int yOut = (int)(7.5 - (0.0133333*yIn));
+        int yOut = (int)(7.5 - (0.0133333*(yIn - 37.5)));
         return yOut;
     }
     static void blackReg(double xIn, double yIn){ //draws a regular black checker
@@ -134,13 +149,13 @@ public class GUI extends backend{
         StdDraw.picture(xIn,yIn+1,"src/rking.png"); //black outline of crown
     }
     public static void backendRun(){
-        Thread backendRun = new Thread(new Runnable() {
+        Thread backendGo = new Thread(new Runnable() {
             public void run() {
                 String[] dummy = new String[3]; //because backend depends on an input string[]
                 backend.main(dummy);
             }
         }
         );
-        backendRun.start(); //runs backend (this will be replaced as it doesn't let GUI interact with backend. just passive for now)
+        backendGo.start(); //runs backend (this will be replaced as it doesn't let GUI interact with backend. just passive for now)
     }
 }
