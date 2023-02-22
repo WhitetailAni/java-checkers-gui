@@ -28,9 +28,6 @@ public class GUI extends backend {
             double xGuiPos = -37.5;
             double yGuiPos = 37.5;
 
-            double mouseX = StdDraw.mouseX();
-            double mouseY = StdDraw.mouseY();
-
             StdDraw.setPenColor(StdDraw.RED);
             //set up board background
             for(int i=0; i<10; i++){
@@ -85,13 +82,6 @@ public class GUI extends backend {
                 System.out.println("MouseY is at " + mouseX + " GUI standard, which is " + xTherapyConversion(mouseX) + " CLI standard");
             }*/
 
-            if(StdDraw.isMousePressed()) {
-                xSel = yTherapyConversion(mouseX);
-                ySel = xTherapyConversion(mouseY);
-                System.out.println(xSel + ", " + xTherapyConversion(mouseX));
-                System.out.println(ySel + ", " + yTherapyConversion(mouseY));
-            }
-
             //update state of checkerboard
             for (int i=0; i<CheckerBoard.length; i++) {
                 for (int j=0; j<CheckerBoard[i].length; j++) {
@@ -107,6 +97,8 @@ public class GUI extends backend {
                 }
             }
 
+            mouseX = StdDraw.mouseY(); //weird bug. dont question it
+            mouseY = StdDraw.mouseX();
 
             //new frame
             StdDraw.show();
@@ -114,20 +106,12 @@ public class GUI extends backend {
             StdDraw.clear();
         }
     }
-    static double xConversionTherapy(int xIn){ //converts x-coordinates of CheckerBoard to x-coordinates for the GUI
+    public static double xConversionTherapy(int xIn){ //converts x-coordinates of CheckerBoard to x-coordinates for the GUI
         double xOut = 37.5 + (75*xIn);
         return xOut;
     }
-    static double yConversionTherapy(int yIn){ //converts y-coordinates of CheckerBoard to y-coordinates for the GUI
+    public static double yConversionTherapy(int yIn){ //converts y-coordinates of CheckerBoard to y-coordinates for the GUI
         double yOut = 562.5 - (75*yIn);
-        return yOut;
-    }
-    static int xTherapyConversion(double xIn){
-        int xOut = (int)((0.0133333*((xIn + 37.5) + 0.1)) - 0.5); //this equation converts coordinates back. the +0.1 is used to fix that the equation rounds each number down 1
-        return xOut;
-    }
-    static int yTherapyConversion(double yIn){
-        int yOut = (int)(7.5 - (0.0133333*(yIn - 37.5)));
         return yOut;
     }
     static void blackReg(double xIn, double yIn){ //draws a regular black checker

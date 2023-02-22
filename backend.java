@@ -10,7 +10,6 @@ public class backend {
     public static String ANSI_BLACK = "\u001B[30m";
     public static String ANSI_BLACKBG = "\u001B[40m";
     public static String ANSI_BLUE = "\u001B[34m";
-    public static String ANSI_BLUEBG = "\u001B[44m";
 
     //the int[][] array that stores checker positions
     public static int[][] CheckerBoard = new int[8][8]; //makes board available to GUI class as well as Main class
@@ -29,8 +28,9 @@ public class backend {
     public static int blackCaptured = 0;
     public static int redCaptured = 0;
 
-    //tells backend to proceed (xSel and ySel have been set)
-    public static boolean proceed = false;
+    //mouseX and mouseY variables
+    public static double mouseX = 0;
+    public static double mouseY = 0;
 
     public static void main(String[] args) throws NumberFormatException {
 
@@ -96,6 +96,11 @@ public class backend {
         boolean multiturn; //used to determine if the player can take another turn or not (only used if a piece was jumped)
         boolean errorCheck = true;
 
+        //StdDraw managing
+        StdDraw.setCanvasSize(600, 655);
+        StdDraw.setXscale(0, 600);
+        StdDraw.setYscale(0, 655);
+
         Scanner coordIn = new Scanner(System.in); //this Scanner handles all input during the game
         while(true) {
             String intCoordIn;
@@ -117,10 +122,21 @@ public class backend {
                             break pieceSelectBlack;
                         } else {
                             System.out.println("Input the coordinates of the piece you would like to move, format 'x,y'");
-                            //intCoordIn = coordIn.nextLine();
                             try{
-                                //xSel = Integer.parseInt(intCoordIn.substring(0, 1));
-                               // ySel = Integer.parseInt(intCoordIn.substring(2, 3));
+                                while (true) {
+                                    if(StdDraw.isMousePressed()){
+                                        break;
+                                    }
+                                }
+                                xSel = xTherapyConversion(mouseX);
+                                ySel = yTherapyConversion(mouseY);
+                                System.out.println(xSel + ", " + ySel);
+                                while (true) {
+                                    if(!StdDraw.isMousePressed()){
+                                        break; //wait for mouse to be unclicked to avoid double click
+                                    }
+                                }
+
                                 //check if coords are invalid
                                 if (xSel == 6 && ySel == 9) {
                                     System.out.println("Cheat mode toggled");
@@ -246,10 +262,20 @@ public class backend {
                             break masterBlack;
                         }
                         System.out.println("Input the coordinates of the spot you would like to move to, format 'x,y'");
-                        intCoordIn = coordIn.nextLine();
                         try {
-                            xDest = Integer.parseInt(intCoordIn.substring(0, 1));
-                            yDest = Integer.parseInt(intCoordIn.substring(2, 3));
+                            while (true) {
+                                if(StdDraw.isMousePressed()){
+                                    break;
+                                }
+                            }
+                            xDest = xTherapyConversion(mouseX);
+                            yDest = yTherapyConversion(mouseY);
+                            System.out.println(xDest + ", " + yDest);
+                            while (true) {
+                                if(!StdDraw.isMousePressed()){
+                                    break; //wait for mouse to be unclicked to avoid double click
+                                }
+                            }
                         }
                         catch(NumberFormatException | StringIndexOutOfBoundsException e){
                             System.out.println("You can only input coordinates in the format 'x,y'!");
@@ -291,8 +317,13 @@ public class backend {
                         }
                     }
                     System.out.println(errorCheck);
-                    if(multiturn == false && errorCheck == false){
+                    if(!multiturn && !errorCheck){
                         break masterBlack;
+                    }
+                }
+                while (true) {
+                    if(!StdDraw.isMousePressed()){
+                        break; //wait for mouse to be unclicked to avoid double click
                     }
                 }
                 blackTurn = false;
@@ -318,10 +349,20 @@ public class backend {
                             break pieceSelectRed;
                         } else {
                             System.out.println("Input the coordinates of the piece you would like to move, format 'x,y'");
-                            intCoordIn = coordIn.nextLine();
                             try {
-                                xSel = Integer.parseInt(intCoordIn.substring(0, 1));
-                                ySel = Integer.parseInt(intCoordIn.substring(2, 3));
+                                while (true) {
+                                    if(StdDraw.isMousePressed()){
+                                        break;
+                                    }
+                                }
+                                xSel = xTherapyConversion(mouseX);
+                                ySel = yTherapyConversion(mouseY);
+                                System.out.println(xSel + ", " + ySel);
+                                while (true) {
+                                    if(!StdDraw.isMousePressed()){
+                                        break; //wait for mouse to be unclicked to avoid double click
+                                    }
+                                }
 
                                 if (xSel == 420 && ySel == 69) {
                                     System.out.println("Cheat mode toggled");
@@ -342,7 +383,7 @@ public class backend {
                     pieceMoveRed:
                     while (true) { // destination select loop
                         if (ySel <= 1) {
-                            if ((CheckerBoard[xSel + 1][ySel + 1] == 1 || CheckerBoard[xSel + 1][ySel + 1] == 3) && CheckerBoard[xSel + 2][ySel + 2] == 0) {
+                            if (!(xSel >= 6) && (CheckerBoard[xSel + 1][ySel + 1] == 1 || CheckerBoard[xSel + 1][ySel + 1] == 3) && CheckerBoard[xSel + 2][ySel + 2] == 0) {
                                 System.out.println("You must make a forced jump");
                                 CheckerBoard[xSel + 2][ySel + 2] = CheckerBoard[xSel][ySel];
                                 CheckerBoard[xSel + 1][ySel + 1] = 0;
@@ -397,7 +438,7 @@ public class backend {
                                 xSel = xSel + 2;
                                 ySel = ySel + 2;
                                 break pieceMoveRed;
-                            } else if ((CheckerBoard[xSel + 1][ySel - 1] == 1 || CheckerBoard[xSel + 1][ySel - 1] == 3) && (CheckerBoard[xSel + 2][ySel - 2] == 0 || cheatModeRed)) {
+                            } else if (!(xSel >= 6) && (CheckerBoard[xSel + 1][ySel - 1] == 1 || CheckerBoard[xSel + 1][ySel - 1] == 3) && (CheckerBoard[xSel + 2][ySel - 2] == 0 || cheatModeRed)) {
                                 System.out.println("You must make a forced jump");
                                 CheckerBoard[xSel + 2][ySel - 2] = CheckerBoard[xSel][ySel];
                                 CheckerBoard[xSel + 1][ySel - 1] = 0;
@@ -433,10 +474,21 @@ public class backend {
                             break masterRed;
                         }
                         System.out.println("Input the coordinates of the spot you would like to move to, format 'x,y'");
-                        intCoordIn = coordIn.nextLine();
+                        //intCoordIn = coordIn.nextLine();
                         try {
-                            xDest = Integer.parseInt(intCoordIn.substring(0, 1));
-                            yDest = Integer.parseInt(intCoordIn.substring(2, 3));
+                            while (true) {
+                                if(StdDraw.isMousePressed()){
+                                    break;
+                                }
+                            }
+                            xDest = xTherapyConversion(mouseX);
+                            yDest = yTherapyConversion(mouseY);
+                            System.out.println(xDest + ", " + yDest);
+                            while (true) {
+                                if(!StdDraw.isMousePressed()){
+                                    break; //wait for mouse to be unclicked to avoid double click
+                                }
+                            }
                         } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
                             System.out.println("You can only input coordinates in the format 'x,y'!");
                         }
@@ -451,6 +503,8 @@ public class backend {
                                 || // OR
                                 cheatModeRed) //cheatMode is enabled (skip destination checks)
                         {
+                            CheckerBoard[xDest][yDest] = CheckerBoard[xSel][ySel];
+                            CheckerBoard[xSel][ySel] = 0;
                             if (xDest == 7) {
                                 System.out.println("Red piece at " + xDest + "," + yDest + " is now a king, and can move any direction");
                                 CheckerBoard[xDest][yDest] = 4;
@@ -470,7 +524,7 @@ public class backend {
                             }
                         }
                     }
-                    if(multiturn == false && errorCheck == false){
+                    if(!multiturn && !errorCheck){
                         break masterRed;
                     }
                 }
@@ -671,5 +725,47 @@ public class backend {
             System.out.print(" ");
         }
         System.out.println();
+    }
+    public static int yTherapyConversion(double xIn){
+        int xOut = 0; //method names are switched bc of an odd bug
+        if(xIn >= 0 && xIn <= 75){
+            xOut = 0;
+        } else if(xIn > 75 && xIn <= 150){
+            xOut = 1;
+        } else if(xIn > 150 && xIn <= 225){
+            xOut = 2;
+        } else if(xIn > 225 && xIn <= 300){
+            xOut = 3;
+        } else if(xIn > 300 && xIn <= 375){
+            xOut = 4;
+        } else if(xIn > 375 && xIn <= 450){
+            xOut = 5;
+        } else if(xIn > 450 && xIn <= 525){
+            xOut = 6;
+        } else if(xIn > 525 && xIn <= 600) {
+            xOut = 7;
+        } //this was originally an equation but it had weird edge cases. This is longer but more reliable
+        return xOut;
+    }
+    public static int xTherapyConversion(double yIn){
+        int yOut = 0;
+        if(yIn >= 0 && yIn <= 75){
+            yOut = 7;
+        } else if(yIn > 75 && yIn <= 150){
+            yOut = 6;
+        } else if(yIn > 150 && yIn <= 225){
+            yOut = 5;
+        } else if(yIn > 225 && yIn <= 300){
+            yOut = 4;
+        } else if(yIn > 300 && yIn <= 375){
+            yOut = 3;
+        } else if(yIn > 375 && yIn <= 450){
+            yOut = 2;
+        } else if(yIn > 450 && yIn <= 525){
+            yOut = 1;
+        } else if(yIn > 525 && yIn <= 600) {
+            yOut = 0;
+        } //this was originally an equation but it had weird edge cases. This is longer but more reliable
+        return yOut;
     }
 }
