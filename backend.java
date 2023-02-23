@@ -32,6 +32,16 @@ public class backend {
     public static double mouseX = 0;
     public static double mouseY = 0;
 
+    //control the title bar
+    public static boolean moveBlack = false; //show alert if black tries to select a piece it's not allowed to
+    public static boolean moveRed = false; //show alert if red tries to select a piece it's not allowed to
+    public static boolean emptyBlack = false; //show alert if black tries to select an empty space
+    public static boolean emptyRed = false; //show alert if red tries to select an empty space
+    public static boolean selectNewPiece = false; //show alert if player can select new piece
+    public static boolean notAllowed = false; //show alert if movement isn't allowed
+    public static int misclick; //used in case of misinput (prevent game softlocks)
+    public static boolean misclick2 = false; //counterpart of misclick for communicating with GUI
+
     public static void main(String[] args) throws NumberFormatException {
 
         //credits
@@ -92,7 +102,6 @@ public class backend {
         boolean cheatModeRed = false;
 
         //checkers managing
-        int misclick = 0; //used in case of misinput (prevent game softlocks)
         boolean multiturn; //used to determine if the player can take another turn or not (only used if a piece was jumped)
         boolean errorCheck = true;
 
@@ -142,9 +151,13 @@ public class backend {
                                     System.out.println("Cheat mode toggled");
                                     cheatModeBlack = !cheatModeBlack;
                                 } else if (CheckerBoard[xSel][ySel] == 2 || CheckerBoard[xSel][ySel] == 4) {
-                                    System.out.println("You cannot move red's pieces");
+                                    System.out.println("You can't move RED's pieces!");
+                                    emptyBlack = false;
+                                    moveBlack = true;
                                 } else if (CheckerBoard[xSel][ySel] == 0) {
-                                    System.out.println("You cannot move an empty space");
+                                    System.out.println("You can't move an empty space!");
+                                    moveBlack = false;
+                                    emptyBlack = true;
                                 } else {
                                     break pieceSelectBlack;
                                 }
@@ -154,6 +167,8 @@ public class backend {
                             }
                         }
                     }
+                    moveBlack = false;
+                    emptyBlack = false;
                     pieceMoveBlack:
                     while (true) { //pieceMoveBlack, destination select and jump loop
                         if (ySel <= 1) {
@@ -302,11 +317,23 @@ public class backend {
                         } else {
                             try {
                                 System.out.println("Invalid movement");
+                                misclick2 = true;
                                 System.out.println("Select new piece? '1' for yes, '0' for no");
-                                misclick = Integer.parseInt(coordIn.nextLine().substring(0, 1));
+                                while (true){
+                                    if(!misclick2){
+                                        break;
+                                    }
+                                }
+                                if(misclick == 0){System.out.println("misclick = 0");}
                                 if (misclick == 1) {
+                                    System.out.println("misclick = 1");
                                     errorCheck = true;
                                     break pieceMoveBlack;
+                                }
+                                while (true){ //prevent lock
+                                    if(!StdDraw.isMousePressed()){
+                                        break;
+                                    }
                                 }
                             }
                             catch(NumberFormatException | StringIndexOutOfBoundsException e){

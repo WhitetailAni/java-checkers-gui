@@ -18,6 +18,7 @@ public class GUI extends backend {
 
         //resources for title bar
         Font title = new Font("Sans Serif", Font.BOLD, 30);
+        Font alert = new Font("Sans Serif", Font.BOLD, 22);
         Font captured = new Font("Sans Serif", Font.BOLD, 14);
 
         backendRun(); //runs the backend of checkers
@@ -51,35 +52,83 @@ public class GUI extends backend {
             StdDraw.filledRectangle(300,630,300,25);
 
             //display current turn
-            StdDraw.setFont(title);
-            if(blackTurn){
-                StdDraw.setPenColor(StdDraw.BLACK);
-                StdDraw.text(300,625,"It is BLACK's turn");
-            } else {
+            if(redTurn){
                 StdDraw.setPenColor(StdDraw.RED);
-                StdDraw.text(300,625,"It is RED's turn");
+            } else {
+                StdDraw.setPenColor(StdDraw.BLACK);
             }
+            if(!misclick2) {
+                if (blackTurn) {
+                    if (moveBlack) {
+                        StdDraw.setFont(alert);
+                        StdDraw.text(300, 640, "You can't move");
+                        StdDraw.text(300, 615, "RED's pieces!");
+                    } else if (emptyBlack) {
+                        StdDraw.setFont(alert);
+                        StdDraw.text(300, 640, "You can't move");
+                        StdDraw.text(300, 615, "an empty space!");
+                    } else {
+                        StdDraw.setFont(title);
+                        StdDraw.text(300, 625, "It is BLACK's turn");
+                    }
+                } else {
+                    if (moveRed) {
+                        StdDraw.setFont(alert);
+                        StdDraw.text(300, 640, "You can't move");
+                        StdDraw.text(300, 615, "BLACK's pieces!");
+                    } else if (emptyRed) {
+                        StdDraw.setFont(alert);
+                        StdDraw.text(300, 640, "You can't move");
+                        StdDraw.text(300, 615, "an empty space!");
+                    } else {
+                        StdDraw.setFont(title);
+                        StdDraw.text(300, 625, "It is RED's turn");
+                    }
+                }
 
-            //display captured pieces
-            StdDraw.setFont(captured);
-            StdDraw.setPenColor(StdDraw.BLACK);
-            StdDraw.text(90,635, "Black has captured");
-            if(blackCaptured == 1){
-                StdDraw.text(90, 621, "1 piece");
+                //display captured pieces
+                StdDraw.setFont(captured);
+                StdDraw.text(90, 635, "Black has captured");
+                if (blackCaptured == 1) {
+                    StdDraw.text(90, 621, "1 piece");
+                } else {
+                    StdDraw.text(90, 621, blackCaptured + " pieces");
+                }
+                StdDraw.setPenColor(StdDraw.RED);
+                StdDraw.text(510, 635, "Red has captured");
+                if (redCaptured == 1) {
+                    StdDraw.text(510, 621, blackCaptured + " pieces");
+                } else {
+                    StdDraw.text(510, 621, redCaptured + " pieces");
+                }
             } else {
-                StdDraw.text(90, 621, blackCaptured + " pieces");
-            }
-            StdDraw.setPenColor(StdDraw.RED);
-            StdDraw.text(510,635, "Red has captured");
-            if(redCaptured == 1) {
-                StdDraw.text(510, 621, blackCaptured + " pieces");
-            } else {
-                StdDraw.text(510, 621, redCaptured + " pieces");
+                StdDraw.setPenColor(StdDraw.BLACK);
+                StdDraw.setFont(title);
+                StdDraw.text(300, 625, "Select a new piece?");
+                StdDraw.setFont(alert);
+                StdDraw.text(520, 625, "Yes");
+                StdDraw.text(80, 625, "No");
+                if(StdDraw.isMousePressed()){
+                    if((60 <= mouseY && mouseY <= 100) && (620 <= mouseX && mouseX <= 640)){
+                        System.out.println("no");
+                        misclick = 0;
+                        misclick2 = false;
+                    } else if((500 <= mouseY && mouseY <= 540) && (620 <= mouseX && mouseX <= 640)){
+                        System.out.println("yes");
+                        misclick = 1;
+                        misclick2 = false;
+                    }
+                    while (true){
+                        if(!StdDraw.isMousePressed()){
+                            break;
+                        }
+                    }
+                }
             }
 
             /*if(StdDraw.isMousePressed()) {//current mouse coordinates
-                System.out.println("MouseX is at " + mouseY + " GUI standard, which is " + yTherapyConversion(mouseY) + " CLI standard");
-                System.out.println("MouseY is at " + mouseX + " GUI standard, which is " + xTherapyConversion(mouseX) + " CLI standard");
+                System.out.println("MouseX is at " + mouseY);
+                System.out.println("MouseY is at " + mouseX);
             }*/
 
             //update state of checkerboard
@@ -107,12 +156,10 @@ public class GUI extends backend {
         }
     }
     public static double xConversionTherapy(int xIn){ //converts x-coordinates of CheckerBoard to x-coordinates for the GUI
-        double xOut = 37.5 + (75*xIn);
-        return xOut;
+        return 37.5 + (75*xIn);
     }
     public static double yConversionTherapy(int yIn){ //converts y-coordinates of CheckerBoard to y-coordinates for the GUI
-        double yOut = 562.5 - (75*yIn);
-        return yOut;
+        return 562.5 - (75*yIn);
     }
     static void blackReg(double xIn, double yIn){ //draws a regular black checker
         StdDraw.setPenColor(StdDraw.BLACK);
@@ -133,11 +180,9 @@ public class GUI extends backend {
         StdDraw.picture(xIn,yIn+1,"src/rking.png"); //black outline of crown
     }
     public static void backendRun(){
-        Thread backendGo = new Thread(new Runnable() {
-            public void run() {
-                String[] dummy = new String[3]; //because backend depends on an input string[]
-                backend.main(dummy);
-            }
+        Thread backendGo = new Thread(() -> {
+            String[] dummy = new String[3]; //because backend depends on an input string[]
+            backend.main(dummy);
         }
         );
         backendGo.start(); //runs backend (this will be replaced as it doesn't let GUI interact with backend. just passive for now)
