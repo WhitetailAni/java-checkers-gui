@@ -1,3 +1,4 @@
+import java.awt.*;
 import java.util.Scanner;
 
 public class backend {
@@ -41,13 +42,14 @@ public class backend {
     public static boolean notAllowed = false; //show alert if movement isn't allowed
     public static int misclick; //used in case of misinput (prevent game softlocks)
     public static boolean misclick2 = false; //counterpart of misclick for communicating with GUI
+    public static boolean selectPiece = false; //show prompt to select piece
+    public static boolean selectDest = false; //show prompt to select destination
 
     public static void main(String[] args) throws NumberFormatException {
 
         //credits
         System.out.println("Checkers, written in Java, made by WhitetailAni");
         System.out.println("Copyright (c) 2023 WhitetailAni under the MIT license");
-
 
         //explain what each piece is
         System.out.println(ANSI_WHITE + "0 = empty space" + ANSI_RESET);
@@ -114,12 +116,12 @@ public class backend {
         while(true) {
             String intCoordIn;
             if (blackTurn) {
-                errorCheck = false;
                 multiturn = false;
                 printBoard(CheckerBoard, false);
                 System.out.println("It is " + ANSI_BLUE + "BLACK's" + ANSI_RESET + " turn");
                 masterBlack:
                 while (true) { //masterBlack
+                    errorCheck = false;
                     pieceSelectBlack:
                     while (true) { //pieceSelectBlack
                         //get coordinates of desired piece
@@ -131,6 +133,7 @@ public class backend {
                             break pieceSelectBlack;
                         } else {
                             System.out.println("Input the coordinates of the piece you would like to move, format 'x,y'");
+                            selectPiece = true;
                             try{
                                 while (true) {
                                     if(StdDraw.isMousePressed()){
@@ -167,6 +170,7 @@ public class backend {
                             }
                         }
                     }
+                    selectPiece = false;
                     moveBlack = false;
                     emptyBlack = false;
                     pieceMoveBlack:
@@ -277,6 +281,7 @@ public class backend {
                             break masterBlack;
                         }
                         System.out.println("Input the coordinates of the spot you would like to move to, format 'x,y'");
+                        selectDest = true;
                         try {
                             while (true) {
                                 if(StdDraw.isMousePressed()){
@@ -314,24 +319,30 @@ public class backend {
                                 CheckerBoard[xDest][yDest] = 3;
                             }
                             break pieceMoveBlack;
-                        } else {
+                        } else if(xSel == xDest && ySel == yDest) { } else {
                             try {
                                 System.out.println("Invalid movement");
                                 misclick2 = true;
                                 System.out.println("Select new piece? '1' for yes, '0' for no");
                                 while (true){
+                                    System.out.println("backend, upper loop"); //these print statements are here
                                     if(!misclick2){
+                                        System.out.println("backend, exited upper loop"); //because if I remove them
                                         break;
                                     }
                                 }
-                                if(misclick == 0){System.out.println("misclick = 0");}
+                                if(misclick == 0){
+                                    System.out.println("misclick = 0");
+                                }
                                 if (misclick == 1) {
                                     System.out.println("misclick = 1");
                                     errorCheck = true;
                                     break pieceMoveBlack;
                                 }
                                 while (true){ //prevent lock
+                                    System.out.println("backend, lower loop"); //this section of code breaks
                                     if(!StdDraw.isMousePressed()){
+                                        System.out.println("backend, exited lower loop"); //and I have no idea why (continued on red's side)
                                         break;
                                     }
                                 }
@@ -353,6 +364,8 @@ public class backend {
                         break; //wait for mouse to be unclicked to avoid double click
                     }
                 }
+
+                selectDest = false;
                 blackTurn = false;
                 redTurn = true;
 
@@ -360,12 +373,12 @@ public class backend {
                     break;
                 }
             } else if (redTurn) {
-                errorCheck = false;
                 multiturn = false;
                 printBoard(CheckerBoard, false);
                 System.out.println("It is " + ANSI_RED + "RED's" + ANSI_RESET + " turn");
                 masterRed:
                 while (true) {
+                    errorCheck = false;
                     pieceSelectRed:
                     while (true) { //piece select loop
                         if(multiturn) {
@@ -376,6 +389,7 @@ public class backend {
                             break pieceSelectRed;
                         } else {
                             System.out.println("Input the coordinates of the piece you would like to move, format 'x,y'");
+                            selectPiece = true;
                             try {
                                 while (true) {
                                     if(StdDraw.isMousePressed()){
@@ -396,8 +410,12 @@ public class backend {
                                     cheatModeRed = !cheatModeRed;
                                 } else if (CheckerBoard[xSel][ySel] == 1 || CheckerBoard[xSel][ySel] == 3) {
                                     System.out.println("You cannot move black's pieces");
+                                    emptyRed = false;
+                                    moveRed = true;
                                 } else if (CheckerBoard[xSel][ySel] == 0) {
                                     System.out.println("You cannot move an empty space");
+                                    moveRed = false;
+                                    emptyRed = true;
                                 } else {
                                     break pieceSelectRed;
                                 }
@@ -407,6 +425,9 @@ public class backend {
                             }
                         }
                     }
+                    selectPiece = false;
+                    moveRed = false;
+                    emptyRed = false;
                     pieceMoveRed:
                     while (true) { // destination select loop
                         if (ySel <= 1) {
@@ -443,7 +464,7 @@ public class backend {
                                 ySel = ySel - 2;
                                 break pieceMoveRed;
                             }
-                            if (!(xSel >= 6) && (CheckerBoard[xSel + 1][ySel - 1] == 1 || CheckerBoard[xSel + 1][ySel - 1] == 3) && (CheckerBoard[xSel + 2][ySel - 2] == 0 || cheatModeRed) && CheckerBoard[xSel][ySel] == 4) {
+                            if ((CheckerBoard[xSel + 1][ySel - 1] == 1 || CheckerBoard[xSel + 1][ySel - 1] == 3) && (CheckerBoard[xSel + 2][ySel - 2] == 0 || cheatModeRed)) {
                                 System.out.println("You must make a forced jump");
                                 CheckerBoard[xSel + 2][ySel - 2] = CheckerBoard[xSel][ySel];
                                 CheckerBoard[xSel + 1][ySel - 1] = 0;
@@ -501,6 +522,7 @@ public class backend {
                             break masterRed;
                         }
                         System.out.println("Input the coordinates of the spot you would like to move to, format 'x,y'");
+                        selectDest = true;
                         //intCoordIn = coordIn.nextLine();
                         try {
                             while (true) {
@@ -537,14 +559,32 @@ public class backend {
                                 CheckerBoard[xDest][yDest] = 4;
                             }
                             break pieceMoveRed;
-                        } else {
+                        } else if(xSel == xDest && ySel == yDest) { } else {
                             try {
-                                System.out.println("The destination coordinates must be empty");
+                                System.out.println("Invalid movement");
+                                misclick2 = true;
                                 System.out.println("Select new piece? '1' for yes, '0' for no");
-                                misclick = Integer.parseInt(coordIn.nextLine().substring(0, 1));
+                                while (true){
+                                    System.out.println("backend, upper loop"); //if I remove them, the code gets stuck
+                                    if(!misclick2){
+                                        System.out.println("backend, exited upper loop"); //so here they stay
+                                        break;
+                                    }
+                                }
+                                if(misclick == 0){
+                                    System.out.println("misclick = 0");
+                                }
                                 if (misclick == 1) {
+                                    System.out.println("misclick = 1");
                                     errorCheck = true;
                                     break pieceMoveRed;
+                                }
+                                while (true){ //prevent lock
+                                    System.out.println("backend, lower loop"); //sorry about the spam in your terminal output
+                                    if(!StdDraw.isMousePressed()){
+                                        System.out.println("backend, exited lower loop"); //-WhitetailAni
+                                        break;
+                                    }
                                 }
                             } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
                                 System.out.println("You can only input coordinates in the format 'x,y'!");
@@ -555,6 +595,7 @@ public class backend {
                         break masterRed;
                     }
                 }
+                selectDest = false;
                 redTurn = false;
                 blackTurn = true;
             }
