@@ -1,13 +1,16 @@
 import java.awt.*;
 
 public class GUI extends backend {
+    
+    public static Color customRed = new Color(240, 25, 25);
+    public static Color transparent = new Color(44,44,44,90);
 
     public static void main(String[] args) {
 
         //configure StdDraw
         double timeElapsed = 0.017; //each frame is 0.017 seconds long
         StdDraw.setPenRadius(0.05);
-        StdDraw.setPenColor(StdDraw.RED);
+        StdDraw.setPenColor(customRed);
         StdDraw.setCanvasSize(600, 655);
         StdDraw.setXscale(0, 600);
         StdDraw.setYscale(0, 655);
@@ -18,9 +21,9 @@ public class GUI extends backend {
 
         //resources for title bar
         Font title = new Font("Sans Serif", Font.BOLD, 30);
-        Font inBetween = new Font("Sans Serif", Font.BOLD, 25);
         Font alert = new Font("Sans Serif", Font.BOLD, 20);
-        Font captured = new Font("Sans Serif", Font.BOLD, 14);
+        Font captured = new Font("Helvetica", Font.BOLD, 15);
+        Font e = new Font("Comic Sans MS", Font.BOLD, 200);
 
         backendRun(); //runs the backend of checkers
         watchdogRun(); //runs watchdog
@@ -31,7 +34,7 @@ public class GUI extends backend {
             double xGuiPos = -37.5;
             double yGuiPos = 37.5;
 
-            StdDraw.setPenColor(StdDraw.RED);
+            StdDraw.setPenColor(customRed);
             //set up board background
             for(int i=0; i<10; i++){
                 for(int j=0; j<10; j++) {
@@ -50,12 +53,12 @@ public class GUI extends backend {
             }
             StdDraw.setPenColor(StdDraw.BLACK);
             StdDraw.filledRectangle(300, 602.5, 300, 2.5);
-            StdDraw.setPenColor(StdDraw.PRINCETON_ORANGE);
+            StdDraw.setPenColor(57, 191, 182);
             StdDraw.filledRectangle(300,630,300,25);
 
             //display current turn
             if(redTurn){
-                StdDraw.setPenColor(StdDraw.RED);
+                StdDraw.setPenColor(customRed);
             } else {
                 StdDraw.setPenColor(StdDraw.BLACK);
             }
@@ -67,10 +70,10 @@ public class GUI extends backend {
             //show alerts
             if(!misclick2) { //misclick prompt needs to override everything else rendered
                 if (blackTurn) {
-                    if (cheatMode) {
+                    /*if (cheatMode) {
                         StdDraw.setFont(inBetween);
                         StdDraw.text(300, 627, "Cheat mode toggled");
-                    } else if(selectPiece) {
+                    } else*/ if(selectPiece) {
                         StdDraw.setFont(alert);
                         StdDraw.text(300, 640, "It is BLACK's turn");
                         StdDraw.text(300, 615, "Select a piece to move");
@@ -90,11 +93,11 @@ public class GUI extends backend {
                         StdDraw.setFont(title);
                         StdDraw.text(300, 625, "It is BLACK's turn");
                     }
-                } else {
-                    if(cheatMode) {
+                } else if(redTurn){
+                    /*if(cheatMode) {
                         StdDraw.setFont(inBetween);
                         StdDraw.text(300, 627, "Cheat mode toggled");
-                    } else if(selectPiece) {
+                    } else*/ if(selectPiece) {
                         StdDraw.setFont(alert);
                         StdDraw.text(300, 640, "It is RED's turn");
                         StdDraw.text(300, 615, "Select a piece to move");
@@ -125,7 +128,7 @@ public class GUI extends backend {
                 } else {
                     StdDraw.text(90, 621, blackCaptured + " pieces");
                 }
-                StdDraw.setPenColor(StdDraw.RED);
+                StdDraw.setPenColor(customRed);
                 StdDraw.text(510, 635, "Red has captured");
                 if (redCaptured == 1) {
                     StdDraw.text(510, 621, blackCaptured + " pieces");
@@ -187,13 +190,32 @@ public class GUI extends backend {
                     StdDraw.circle(xConversionTherapy(ySel), yConversionTherapy(xSel), 31);
                     StdDraw.circle(xConversionTherapy(ySel), yConversionTherapy(xSel), 30);
                 } else {
-                    StdDraw.picture(xConversionTherapy(ySel),yConversionTherapy(xSel), "src/crosshair.png");
+                    StdDraw.picture(xConversionTherapy(ySel),yConversionTherapy(xSel), "crosshair.png");
                 }
             }
             //this is a bad way to do it. will be updated
 
             mouseX = StdDraw.mouseY(); //this is because of a weird bug. Easier to do this than figure out why
             mouseY = StdDraw.mouseX(); //Doesn't really affect anything as long as they're flipped like this
+
+            if(blackWins || redWins) {
+                StdDraw.setPenColor(transparent);
+                StdDraw.filledRectangle(300,350,300,350);
+                StdDraw.filledRectangle(300,350,300,350);
+                StdDraw.filledRectangle(300,350,300,350);
+                StdDraw.setPenColor(StdDraw.WHITE);
+                StdDraw.filledRectangle(300,300,125,60);
+                if (blackWins) {
+                    StdDraw.setPenColor(StdDraw.BLACK);
+                    StdDraw.setFont(title);
+                    StdDraw.text(300,297,"Black wins!");
+                } else if (redWins) {
+                    StdDraw.setPenColor(StdDraw.RED);
+                    StdDraw.setFont(title);
+                    StdDraw.text(300,297,"Red wins!");
+                }
+                while (true){ } //prevent GUI from being interacted with after a win is detected
+            }
 
             //new frame
             StdDraw.show();
@@ -218,12 +240,12 @@ public class GUI extends backend {
     static void blackKing(double xIn, double yIn){ //draws a black king checker
         StdDraw.setPenColor(StdDraw.BLACK);
         StdDraw.filledCircle(xIn,yIn,34);
-        StdDraw.picture(xIn,yIn,"src/bking.png"); //white outline of crown
+        StdDraw.picture(xIn,yIn,"bking.png"); //white outline of crown
     }
     static void redKing(double xIn, double yIn){ //draws a red king checker
         StdDraw.setPenColor(StdDraw.RED);
         StdDraw.filledCircle(xIn,yIn+1,34);
-        StdDraw.picture(xIn,yIn+1,"src/rking.png"); //black outline of crown
+        StdDraw.picture(xIn,yIn+1,"rking.png"); //black outline of crown
     }
     public static void backendRun(){
         Thread backendGo = new Thread(() -> {

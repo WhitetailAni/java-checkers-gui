@@ -44,6 +44,10 @@ public class backend {
     public static boolean selectDest = false; //show prompt to select destination
     public static boolean cheatMode = false;
 
+    //win management
+    public static boolean redWins = false;
+    public static boolean blackWins = false;
+
     public static void main(String[] args) throws NumberFormatException {
 
         //credits
@@ -462,7 +466,7 @@ public class backend {
                                 ySel = ySel - 2;
                                 break pieceMoveRed;
                             }
-                            if ((CheckerBoard[xSel + 1][ySel - 1] == 1 || CheckerBoard[xSel + 1][ySel - 1] == 3) && (CheckerBoard[xSel + 2][ySel - 2] == 0 || cheatModeRed)) {
+                            if (!(xSel >= 6) && (CheckerBoard[xSel + 1][ySel - 1] == 1 || CheckerBoard[xSel + 1][ySel - 1] == 3) && (CheckerBoard[xSel + 2][ySel - 2] == 0 || cheatModeRed)) {
                                 System.out.println("You must make a forced jump");
                                 CheckerBoard[xSel + 2][ySel - 2] = CheckerBoard[xSel][ySel];
                                 CheckerBoard[xSel + 1][ySel - 1] = 0;
@@ -601,9 +605,14 @@ public class backend {
             }
         }
         if(blackWon(CheckerBoard)){
+            blackWins = true;
             System.out.println("Black has won the game");
         } else if(redWon(CheckerBoard)){
+            redWins = true;
             System.out.println("Red has won the game");
+        } else {
+            System.out.println("e");
+            System.exit(69);
         }
         printBoard(CheckerBoard, true);
         if(blackCaptured == 1){
