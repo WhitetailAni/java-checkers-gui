@@ -18,10 +18,12 @@ public class GUI extends backend {
 
         //resources for title bar
         Font title = new Font("Sans Serif", Font.BOLD, 30);
+        Font inBetween = new Font("Sans Serif", Font.BOLD, 25);
         Font alert = new Font("Sans Serif", Font.BOLD, 20);
         Font captured = new Font("Sans Serif", Font.BOLD, 14);
 
         backendRun(); //runs the backend of checkers
+        watchdogRun(); //runs watchdog
 
         while (true) {
 
@@ -58,10 +60,17 @@ public class GUI extends backend {
                 StdDraw.setPenColor(StdDraw.BLACK);
             }
 
+            if(StdDraw.isMousePressed() && ((mouseY > 170 && 430 > mouseY) && (mouseX > 615 && 645 > mouseX))){
+                cheatMode = true;
+            }
+
             //show alerts
             if(!misclick2) { //misclick prompt needs to override everything else rendered
                 if (blackTurn) {
-                    if(selectPiece) {
+                    if (cheatMode) {
+                        StdDraw.setFont(inBetween);
+                        StdDraw.text(300, 627, "Cheat mode toggled");
+                    } else if(selectPiece) {
                         StdDraw.setFont(alert);
                         StdDraw.text(300, 640, "It is BLACK's turn");
                         StdDraw.text(300, 615, "Select a piece to move");
@@ -82,7 +91,10 @@ public class GUI extends backend {
                         StdDraw.text(300, 625, "It is BLACK's turn");
                     }
                 } else {
-                    if(selectPiece) {
+                    if(cheatMode) {
+                        StdDraw.setFont(inBetween);
+                        StdDraw.text(300, 627, "Cheat mode toggled");
+                    } else if(selectPiece) {
                         StdDraw.setFont(alert);
                         StdDraw.text(300, 640, "It is RED's turn");
                         StdDraw.text(300, 615, "Select a piece to move");
@@ -145,10 +157,10 @@ public class GUI extends backend {
                 }
             }
 
-            /*if(StdDraw.isMousePressed()) {//current mouse coordinates
-                System.out.println("MouseX is at " + mouseY);
-                System.out.println("MouseY is at " + mouseX);
-            }*/
+            //if(StdDraw.isMousePressed()) {//current mouse coordinates
+            //    System.out.println("MouseX is at " + mouseY);
+            //    System.out.println("MouseY is at " + mouseX);
+            //}
 
             //update state of checkerboard
             for (int i=0; i<CheckerBoard.length; i++) {
@@ -167,17 +179,21 @@ public class GUI extends backend {
 
             //highlight selected checker
             if(!(xSel == 0 && ySel == 0) && !selectPiece) {
-                StdDraw.setPenColor(StdDraw.GREEN);
-                StdDraw.circle(xConversionTherapy(ySel), yConversionTherapy(xSel), 34);
-                StdDraw.circle(xConversionTherapy(ySel), yConversionTherapy(xSel), 33);
-                StdDraw.circle(xConversionTherapy(ySel), yConversionTherapy(xSel), 32);
-                StdDraw.circle(xConversionTherapy(ySel), yConversionTherapy(xSel), 31);
-                StdDraw.circle(xConversionTherapy(ySel), yConversionTherapy(xSel), 30);
+                if(CheckerBoard[xSel][ySel] == 3 && CheckerBoard[xSel][ySel] == 4) {
+                    StdDraw.setPenColor(StdDraw.GREEN);
+                    StdDraw.circle(xConversionTherapy(ySel), yConversionTherapy(xSel), 34);
+                    StdDraw.circle(xConversionTherapy(ySel), yConversionTherapy(xSel), 33);
+                    StdDraw.circle(xConversionTherapy(ySel), yConversionTherapy(xSel), 32);
+                    StdDraw.circle(xConversionTherapy(ySel), yConversionTherapy(xSel), 31);
+                    StdDraw.circle(xConversionTherapy(ySel), yConversionTherapy(xSel), 30);
+                } else {
+                    StdDraw.picture(xConversionTherapy(ySel),yConversionTherapy(xSel), "src/crosshair.png");
+                }
             }
             //this is a bad way to do it. will be updated
 
-            mouseX = StdDraw.mouseY(); //this is because of a dumb decision made by me
-            mouseY = StdDraw.mouseX(); //easier to leave flipped than work out the problems again (for now, will fix later)
+            mouseX = StdDraw.mouseY(); //this is because of a weird bug. Easier to do this than figure out why
+            mouseY = StdDraw.mouseX(); //Doesn't really affect anything as long as they're flipped like this
 
             //new frame
             StdDraw.show();
@@ -216,5 +232,13 @@ public class GUI extends backend {
         }
         );
         backendGo.start(); //runs backend (this will be replaced as it doesn't let GUI interact with backend. just passive for now)
+    }
+    public static void watchdogRun(){
+        Thread watchdogGo = new Thread(() -> {
+            String[] dummy = new String[3]; //because backend depends on an input string[]
+            watchdog.main(dummy);
+        }
+        );
+        watchdogGo.start(); //runs backend (this will be replaced as it doesn't let GUI interact with backend. just passive for now)
     }
 }

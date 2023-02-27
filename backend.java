@@ -1,5 +1,3 @@
-import java.awt.*;
-import java.util.Scanner;
 
 public class backend {
 
@@ -44,6 +42,7 @@ public class backend {
     public static boolean misclick2 = false; //counterpart of misclick for communicating with GUI
     public static boolean selectPiece = false; //show prompt to select piece
     public static boolean selectDest = false; //show prompt to select destination
+    public static boolean cheatMode = false;
 
     public static void main(String[] args) throws NumberFormatException {
 
@@ -112,9 +111,7 @@ public class backend {
         StdDraw.setXscale(0, 600);
         StdDraw.setYscale(0, 655);
 
-        Scanner coordIn = new Scanner(System.in); //this Scanner handles all input during the game
         while(true) {
-            String intCoordIn;
             if (blackTurn) {
                 multiturn = false;
                 printBoard(CheckerBoard, false);
@@ -150,7 +147,7 @@ public class backend {
                                 }
 
                                 //check if coords are invalid
-                                if (xSel == 6 && ySel == 9) {
+                                if (cheatMode) {
                                     System.out.println("Cheat mode toggled");
                                     cheatModeBlack = !cheatModeBlack;
                                 } else if (CheckerBoard[xSel][ySel] == 2 || CheckerBoard[xSel][ySel] == 4) {
@@ -322,6 +319,7 @@ public class backend {
                         } else if(xSel == xDest && ySel == yDest) { } else {
                             try {
                                 System.out.println("Invalid movement");
+                                notAllowed = true;
                                 misclick2 = true;
                                 System.out.println("Select new piece? '1' for yes, '0' for no");
                                 while (true){
@@ -405,7 +403,7 @@ public class backend {
                                     }
                                 }
 
-                                if (xSel == 420 && ySel == 69) {
+                                if (cheatMode) {
                                     System.out.println("Cheat mode toggled");
                                     cheatModeRed = !cheatModeRed;
                                 } else if (CheckerBoard[xSel][ySel] == 1 || CheckerBoard[xSel][ySel] == 3) {
@@ -453,7 +451,7 @@ public class backend {
                                 break pieceMoveRed;
                             }
                         } else if (ySel >= 6) {
-                            if (xSel >= 1 && (CheckerBoard[xSel - 1][ySel - 1] == 1 || CheckerBoard[xSel - 1][ySel - 1] == 3) && (CheckerBoard[xSel - 2][ySel - 2] == 0 || cheatModeRed) && CheckerBoard[xSel][ySel] == 4) {
+                            if (CheckerBoard[xSel][ySel] == 4 && (xSel >= 1 && (CheckerBoard[xSel - 1][ySel - 1] == 1 || CheckerBoard[xSel - 1][ySel - 1] == 3) && (CheckerBoard[xSel - 2][ySel - 2] == 0 || cheatModeRed))) {
                                 System.out.println("You must make a forced jump");
                                 CheckerBoard[xSel - 2][ySel - 2] = CheckerBoard[xSel][ySel];
                                 CheckerBoard[xSel - 1][ySel - 1] = 0;
@@ -523,7 +521,6 @@ public class backend {
                         }
                         System.out.println("Input the coordinates of the spot you would like to move to, format 'x,y'");
                         selectDest = true;
-                        //intCoordIn = coordIn.nextLine();
                         try {
                             while (true) {
                                 if(StdDraw.isMousePressed()){
