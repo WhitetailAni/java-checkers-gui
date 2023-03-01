@@ -48,6 +48,10 @@ public class backend {
     public static boolean redWins = false;
     public static boolean blackWins = false;
 
+    //debug stuff
+    public static boolean cheatModeBlack = false;
+    public static boolean cheatModeRed = false;
+
     public static void main(String[] args) throws NumberFormatException {
 
         //credits
@@ -102,18 +106,11 @@ public class backend {
         CheckerBoard[2][7] = 2;
         CheckerBoard[6][7] = 1;
 
-        //debug stuff
-        boolean cheatModeBlack = false;
-        boolean cheatModeRed = false;
-
         //checkers managing
         boolean multiturn; //used to determine if the player can take another turn or not (only used if a piece was jumped)
         boolean errorCheck = true;
 
         //StdDraw managing
-        StdDraw.setCanvasSize(600, 655);
-        StdDraw.setXscale(0, 600);
-        StdDraw.setYscale(0, 655);
 
         while(true) {
             if (blackTurn) {
@@ -123,6 +120,7 @@ public class backend {
                 masterBlack:
                 while (true) { //masterBlack
                     errorCheck = false;
+                    selectPiece = true;
                     pieceSelectBlack:
                     while (true) { //pieceSelectBlack
                         //get coordinates of desired piece
@@ -134,7 +132,6 @@ public class backend {
                             break pieceSelectBlack;
                         } else {
                             System.out.println("Input the coordinates of the piece you would like to move, format 'x,y'");
-                            selectPiece = true;
                             try{
                                 while (true) {
                                     if(StdDraw.isMousePressed()){
@@ -153,13 +150,16 @@ public class backend {
                                 //check if coords are invalid
                                 if (cheatMode) {
                                     System.out.println("Cheat mode toggled");
+                                    selectPiece = false;
                                     cheatModeBlack = !cheatModeBlack;
-                                } else if (CheckerBoard[xSel][ySel] == 2 || CheckerBoard[xSel][ySel] == 4) {
+                                } else if(mouseY > 600){ } else if (CheckerBoard[xSel][ySel] == 2 || CheckerBoard[xSel][ySel] == 4) {
                                     System.out.println("You can't move RED's pieces!");
+                                    selectPiece = false;
                                     emptyBlack = false;
                                     moveBlack = true;
                                 } else if (CheckerBoard[xSel][ySel] == 0) {
                                     System.out.println("You can't move an empty space!");
+                                    selectPiece = false;
                                     moveBlack = false;
                                     emptyBlack = true;
                                 } else {
@@ -314,7 +314,9 @@ public class backend {
                                 cheatModeBlack) //cheatMode is enabled (skip destination checks)
                         {
                             CheckerBoard[xDest][yDest] = CheckerBoard[xSel][ySel];
-                            CheckerBoard[xSel][ySel] = 0;
+                            if(xSel != xDest && ySel != yDest) {
+                                CheckerBoard[xSel][ySel] = 0;
+                            }
                             if (xDest == 0 && CheckerBoard[xDest][yDest] != 3) {
                                 System.out.println("Black piece at " + xDest + "," + yDest + " is now a king, and can move any direction");
                                 CheckerBoard[xDest][yDest] = 3;
@@ -381,6 +383,7 @@ public class backend {
                 masterRed:
                 while (true) {
                     errorCheck = false;
+                    selectPiece = true;
                     pieceSelectRed:
                     while (true) { //piece select loop
                         if(multiturn) {
@@ -391,7 +394,6 @@ public class backend {
                             break pieceSelectRed;
                         } else {
                             System.out.println("Input the coordinates of the piece you would like to move, format 'x,y'");
-                            selectPiece = true;
                             try {
                                 while (true) {
                                     if(StdDraw.isMousePressed()){
@@ -410,12 +412,15 @@ public class backend {
                                 if (cheatMode) {
                                     System.out.println("Cheat mode toggled");
                                     cheatModeRed = !cheatModeRed;
-                                } else if (CheckerBoard[xSel][ySel] == 1 || CheckerBoard[xSel][ySel] == 3) {
-                                    System.out.println("You cannot move black's pieces");
+                                    selectPiece = false;
+                                } else if(mouseY > 600){ } else if (CheckerBoard[xSel][ySel] == 1 || CheckerBoard[xSel][ySel] == 3) {
+                                    System.out.println("You cannot move BLACK's pieces!");
+                                    selectPiece = false;
                                     emptyRed = false;
                                     moveRed = true;
                                 } else if (CheckerBoard[xSel][ySel] == 0) {
                                     System.out.println("You cannot move an empty space");
+                                    selectPiece = false;
                                     moveRed = false;
                                     emptyRed = true;
                                 } else {
@@ -554,7 +559,9 @@ public class backend {
                                 cheatModeRed) //cheatMode is enabled (skip destination checks)
                         {
                             CheckerBoard[xDest][yDest] = CheckerBoard[xSel][ySel];
-                            CheckerBoard[xSel][ySel] = 0;
+                            if(xSel != xDest && ySel != yDest) {
+                                CheckerBoard[xSel][ySel] = 0;
+                            }
                             if (xDest == 7) {
                                 System.out.println("Red piece at " + xDest + "," + yDest + " is now a king, and can move any direction");
                                 CheckerBoard[xDest][yDest] = 4;
