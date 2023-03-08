@@ -67,103 +67,113 @@ public class GUI extends backend {
             }
 
             //show alerts
-            if(!misclick2) { //misclick prompt needs to override everything else rendered
-                if (blackTurn) {
-                    if (cheatMode) {
-                        StdDraw.setFont(inBetween);
-                        StdDraw.text(300, 627, "Cheat mode toggled");
-                    } else if(selectPiece) {
-                        StdDraw.setFont(alert);
-                        StdDraw.text(300, 638, "It is BLACK's turn");
-                        StdDraw.text(300, 617, "Select a piece to move");
-                    } else if(selectDest) {
-                        StdDraw.setFont(alert);
-                        StdDraw.text(300, 638, "It is BLACK's turn");
-                        StdDraw.text(300, 617, "Select the destination");
-                    } else if (moveBlack) {
-                        StdDraw.setFont(alert);
-                        StdDraw.text(300, 638, "You can't move");
-                        StdDraw.text(300, 617, "RED's pieces!");
-                    } else if (emptyBlack) {
-                        StdDraw.setFont(alert);
-                        StdDraw.text(300, 638, "You can't move");
-                        StdDraw.text(300, 617, "an empty space!");
-                    } else {
-                        StdDraw.setFont(title);
-                        StdDraw.text(300, 625, "It is BLACK's turn");
+            if(!errorCheck) { //error window does as well! (this was added after the line below)
+                if (!misclick2) { //misclick prompt needs to override everything else rendered
+                    if (blackTurn) {
+                        if (cheatMode) {
+                            StdDraw.setFont(inBetween);
+                            StdDraw.text(300, 627, "Cheat mode toggled");
+                        } else if (selectPiece) {
+                            StdDraw.setFont(alert);
+                            StdDraw.text(300, 638, "It is BLACK's turn");
+                            StdDraw.text(300, 617, "Select a piece to move");
+                        } else if (selectDest) {
+                            StdDraw.setFont(alert);
+                            StdDraw.text(300, 638, "It is BLACK's turn");
+                            StdDraw.text(300, 617, "Select the destination");
+                        } else if (moveBlack) {
+                            StdDraw.setFont(alert);
+                            StdDraw.text(300, 638, "You can't move");
+                            StdDraw.text(300, 617, "RED's pieces!");
+                        } else if (emptyBlack) {
+                            StdDraw.setFont(alert);
+                            StdDraw.text(300, 638, "You can't move");
+                            StdDraw.text(300, 617, "an empty space!");
+                        } else {
+                            StdDraw.setFont(title);
+                            StdDraw.text(300, 625, "It is BLACK's turn");
+                        }
+                        if (cheatModeBlack) {
+                            StdDraw.picture(12, 617, "checkra1n.png");
+                        }
+                    } else if (redTurn) {
+                        if (cheatMode) {
+                            StdDraw.setFont(inBetween);
+                            StdDraw.text(300, 627, "Cheat mode toggled");
+                        } else if (selectPiece) {
+                            StdDraw.setFont(alert);
+                            StdDraw.text(300, 638, "It is RED's turn");
+                            StdDraw.text(300, 617, "Select a piece to move");
+                        } else if (selectDest) {
+                            StdDraw.setFont(alert);
+                            StdDraw.text(300, 638, "It is RED's turn");
+                            StdDraw.text(300, 617, "Select the destination");
+                        } else if (moveRed) {
+                            StdDraw.setFont(alert);
+                            StdDraw.text(300, 638, "You can't move");
+                            StdDraw.text(300, 617, "BLACK's pieces!");
+                        } else if (emptyRed) {
+                            StdDraw.setFont(alert);
+                            StdDraw.text(300, 638, "You can't move");
+                            StdDraw.text(300, 617, "an empty space!");
+                        } else {
+                            StdDraw.setFont(title);
+                            StdDraw.text(300, 625, "It is RED's turn");
+                        }
+                        if (cheatModeRed) {
+                            StdDraw.picture(12, 617, "checkra1n.png");
+                        }
                     }
-                    if(cheatModeBlack){
-                        StdDraw.picture(12,617,"checkra1n.png");
-                    }
-                } else if(redTurn){
-                    if(cheatMode) {
-                        StdDraw.setFont(inBetween);
-                        StdDraw.text(300, 627, "Cheat mode toggled");
-                    } else if(selectPiece) {
-                        StdDraw.setFont(alert);
-                        StdDraw.text(300, 638, "It is RED's turn");
-                        StdDraw.text(300, 617, "Select a piece to move");
-                    } else if(selectDest) {
-                        StdDraw.setFont(alert);
-                        StdDraw.text(300, 638, "It is RED's turn");
-                        StdDraw.text(300, 617, "Select the destination");
-                    } else if (moveRed) {
-                        StdDraw.setFont(alert);
-                        StdDraw.text(300, 638, "You can't move");
-                        StdDraw.text(300, 617, "BLACK's pieces!");
-                    } else if (emptyRed) {
-                        StdDraw.setFont(alert);
-                        StdDraw.text(300, 638, "You can't move");
-                        StdDraw.text(300, 617, "an empty space!");
-                    } else {
-                        StdDraw.setFont(title);
-                        StdDraw.text(300, 625, "It is RED's turn");
-                    }
-                    if(cheatModeRed){
-                        StdDraw.picture(12,617,"checkra1n.png");
-                    }
-                }
-                watchdogRun();
+                    watchdogRun();
 
-                //display captured pieces
-                StdDraw.setFont(captured);
-                StdDraw.setPenColor(StdDraw.BLACK);
-                StdDraw.text(90, 635, "Black has captured");
-                if (blackCaptured == 1) {
-                    StdDraw.text(90, 621, "1 piece");
-                } else {
-                    StdDraw.text(90, 621, blackCaptured + " pieces");
-                }
-                StdDraw.setPenColor(customRed);
-                StdDraw.text(510, 635, "Red has captured");
-                if (redCaptured == 1) {
-                    StdDraw.text(510, 621, blackCaptured + " pieces");
-                } else {
-                    StdDraw.text(510, 621, redCaptured + " pieces");
-                }
-            } else {
-                StdDraw.setPenColor(StdDraw.BLACK);
-                StdDraw.setFont(alert);
-                StdDraw.text(300, 638, "You can't move there!");
-                StdDraw.text(300, 617, "Select a new piece?");
-                StdDraw.text(520, 625, "Yes");
-                StdDraw.text(80, 625, "No");
-                if(StdDraw.isMousePressed()){
-                    if((60 <= mouseY && mouseY <= 100) && (620 <= mouseX && mouseX <= 638)){
-                        System.out.println("no");
-                        misclick = 0;
-                        misclick2 = false;
-                    } else if((500 <= mouseY && mouseY <= 540) && (620 <= mouseX && mouseX <= 638)){
-                        System.out.println("yes");
-                        misclick = 1;
-                        misclick2 = false;
+                    //display captured pieces
+                    StdDraw.setFont(captured);
+                    StdDraw.setPenColor(StdDraw.BLACK);
+                    StdDraw.text(90, 635, "Black has captured");
+                    if (blackCaptured == 1) {
+                        StdDraw.text(90, 621, "1 piece");
+                    } else {
+                        StdDraw.text(90, 621, blackCaptured + " pieces");
                     }
-                    while (true){
-                        if(!StdDraw.isMousePressed()){
-                            break;
+                    StdDraw.setPenColor(customRed);
+                    StdDraw.text(510, 635, "Red has captured");
+                    if (redCaptured == 1) {
+                        StdDraw.text(510, 621, blackCaptured + " pieces");
+                    } else {
+                        StdDraw.text(510, 621, redCaptured + " pieces");
+                    }
+                } else {
+                    StdDraw.setPenColor(StdDraw.BLACK);
+                    StdDraw.setFont(alert);
+                    StdDraw.text(300, 638, "You can't move there!");
+                    StdDraw.text(300, 617, "Select a new piece?");
+                    StdDraw.text(520, 625, "Yes");
+                    StdDraw.text(80, 625, "No");
+                    if (StdDraw.isMousePressed()) {
+                        if ((60 <= mouseY && mouseY <= 100) && (620 <= mouseX && mouseX <= 638)) {
+                            System.out.println("no");
+                            misclick = 0;
+                            misclick2 = false;
+                        } else if ((500 <= mouseY && mouseY <= 540) && (620 <= mouseX && mouseX <= 638)) {
+                            System.out.println("yes");
+                            misclick = 1;
+                            misclick2 = false;
+                        }
+                        while (true) {
+                            if (!StdDraw.isMousePressed()) {
+                                break;
+                            }
                         }
                     }
                 }
+            } else {
+                StdDraw.setPenColor(transparent);
+                StdDraw.filledRectangle(300,350,300,350);
+                StdDraw.filledRectangle(300,350,300,350);
+                StdDraw.filledRectangle(300,350,300,350);
+                StdDraw.setPenColor(StdDraw.WHITE);
+                StdDraw.filledRectangle(300,300,200,60);
+                StdDraw.text(300,297,errorMessage);
             }
 
             //if(StdDraw.isMousePressed()) {//current mouse coordinates

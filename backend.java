@@ -51,6 +51,8 @@ public class backend {
     //debug stuff
     public static boolean cheatModeBlack = false;
     public static boolean cheatModeRed = false;
+    public static boolean errorCheck = false;
+    public static String errorMessage = new String();
 
     public static void main(String[] args) throws NumberFormatException {
 
@@ -111,505 +113,511 @@ public class backend {
         boolean errorCheck = true;
 
         //StdDraw managing
-
-        while(true) {
-            if (blackTurn) {
-                multiturn = false;
-                printBoard(CheckerBoard, false);
-                System.out.println("It is " + ANSI_BLUE + "BLACK's" + ANSI_RESET + " turn");
-                masterBlack:
-                while (true) { //masterBlack
-                    errorCheck = false;
-                    selectPiece = true;
-                    pieceSelectBlack:
-                    while (true) { //pieceSelectBlack
-                        //get coordinates of desired piece
-                        if(multiturn) {
-                            if (xSel == 0 && CheckerBoard[xSel][ySel] != 3) {
-                                System.out.println("Black piece at " + xSel + "," + ySel + " is now a king, and can move any direction");
-                                CheckerBoard[xSel][ySel] = 3;
-                            }
-                            break pieceSelectBlack;
-                        } else {
-                            System.out.println("Input the coordinates of the piece you would like to move, format 'x,y'");
-                            try{
-                                while (true) {
-                                    if(StdDraw.isMousePressed()){
-                                        break;
+        try {
+            while (true) {
+                if (blackTurn) {
+                    multiturn = false;
+                    printBoard(CheckerBoard, false);
+                    System.out.println("It is " + ANSI_BLUE + "BLACK's" + ANSI_RESET + " turn");
+                    masterBlack:
+                    while (true) { //masterBlack
+                        errorCheck = false;
+                        selectPiece = true;
+                        pieceSelectBlack:
+                        while (true) { //pieceSelectBlack
+                            //get coordinates of desired piece
+                            if (multiturn) {
+                                if (xSel == 0 && CheckerBoard[xSel][ySel] != 3) {
+                                    System.out.println("Black piece at " + xSel + "," + ySel + " is now a king, and can move any direction");
+                                    CheckerBoard[xSel][ySel] = 3;
+                                }
+                                break pieceSelectBlack;
+                            } else {
+                                System.out.println("Input the coordinates of the piece you would like to move, format 'x,y'");
+                                try {
+                                    while (true) {
+                                        if (StdDraw.isMousePressed()) {
+                                            break;
+                                        }
                                     }
-                                }
-                                xSel = xTherapyConversion(mouseX);
-                                ySel = yTherapyConversion(mouseY);
-                                System.out.println(xSel + ", " + ySel);
-                                while (true) {
-                                    if(!StdDraw.isMousePressed()){
-                                        break; //wait for mouse to be unclicked to avoid double click
+                                    xSel = xTherapyConversion(mouseX);
+                                    ySel = yTherapyConversion(mouseY);
+                                    System.out.println(xSel + ", " + ySel);
+                                    while (true) {
+                                        if (!StdDraw.isMousePressed()) {
+                                            break; //wait for mouse to be unclicked to avoid double click
+                                        }
                                     }
-                                }
 
-                                //check if coords are invalid
-                                if (cheatMode) {
-                                    System.out.println("Cheat mode toggled");
-                                    selectPiece = false;
-                                    cheatModeBlack = !cheatModeBlack;
-                                } else if(mouseY > 600){ } else if (CheckerBoard[xSel][ySel] == 2 || CheckerBoard[xSel][ySel] == 4) {
-                                    System.out.println("You can't move RED's pieces!");
-                                    selectPiece = false;
-                                    emptyBlack = false;
-                                    moveBlack = true;
-                                } else if (CheckerBoard[xSel][ySel] == 0) {
-                                    System.out.println("You can't move an empty space!");
-                                    selectPiece = false;
-                                    moveBlack = false;
-                                    emptyBlack = true;
-                                } else {
-                                    break pieceSelectBlack;
-                                }
-                            }
-                            catch(NumberFormatException | StringIndexOutOfBoundsException e){
-                                System.out.println("You can only input coordinates in the format 'x,y'!");
-                            }
-                        }
-                    }
-                    selectPiece = false;
-                    moveBlack = false;
-                    emptyBlack = false;
-                    pieceMoveBlack:
-                    while (true) { //pieceMoveBlack, destination select and jump loop
-                        if (ySel <= 1) {
-                            if (
-                                    !(xSel <= 1) //the piece is not in a corner (fixes out of bounds)
-                                            && //AND
-                                            (CheckerBoard[xSel - 1][ySel + 1] == 2 || CheckerBoard[xSel - 1][ySel + 1] == 4) //there is a jumpable piece that is RED's
-                                            && //AND
-                                            (CheckerBoard[xSel - 2][ySel + 2] == 0 || cheatModeBlack)) //the destination if the piece is jumped is open
-                            {
-                                System.out.println("You must make a forced jump");
-                                CheckerBoard[xSel - 2][ySel + 2] = CheckerBoard[xSel][ySel];
-                                CheckerBoard[xSel - 1][ySel + 1] = 0;
-                                CheckerBoard[xSel][ySel] = 0;
-                                blackCaptured++;
-                                multiturn = true;
-                                xSel = xSel - 2;
-                                ySel = ySel + 2;
-                                break pieceMoveBlack;
-                            }
-                            if (!(xSel >= 6) && (CheckerBoard[xSel + 1][ySel + 1] == 2 || CheckerBoard[xSel + 1][ySel + 1] == 4) && (CheckerBoard[xSel + 2][ySel + 2] == 0 || cheatModeBlack)) {
-                                System.out.println("You must make a forced jump");
-                                CheckerBoard[xSel + 2][ySel + 2] = CheckerBoard[xSel][ySel];
-                                CheckerBoard[xSel + 1][ySel + 1] = 0;
-                                CheckerBoard[xSel][ySel] = 0;
-                                blackCaptured++;
-                                multiturn = true;
-                                xSel = xSel + 2;
-                                ySel = ySel + 2;
-                                break pieceMoveBlack;
-                            }
-                        } else if (ySel >= 6) {
-                            if (!(xSel <= 1) && (CheckerBoard[xSel - 1][ySel - 1] == 2 || CheckerBoard[xSel - 1][ySel - 1] == 4) && (CheckerBoard[xSel - 2][ySel - 2] == 0 || cheatModeBlack)) {
-                                System.out.println("You must make a forced jump");
-                                CheckerBoard[xSel - 2][ySel - 2] = CheckerBoard[xSel][ySel];
-                                CheckerBoard[xSel - 1][ySel - 1] = 0;
-                                CheckerBoard[xSel][ySel] = 0; //moves piece
-                                blackCaptured++;
-                                multiturn = true;
-                                xSel = xSel - 2;
-                                ySel = ySel - 2;
-                                break pieceMoveBlack;
-                            }
-                            if ((CheckerBoard[xSel + 1][ySel - 1] == 2 || CheckerBoard[xSel + 1][ySel - 1] == 4) && (CheckerBoard[xSel + 2][ySel - 2] == 0 || cheatModeBlack)) {
-                                System.out.println("You must make a forced jump");
-                                CheckerBoard[xSel + 2][ySel - 2] = CheckerBoard[xSel][ySel];
-                                CheckerBoard[xSel + 1][ySel - 1] = 0;
-                                CheckerBoard[xSel][ySel] = 0; //moves piece
-                                blackCaptured++;
-                                multiturn = true;
-                                xSel = xSel + 2;
-                                ySel = ySel - 2;
-                                break pieceMoveBlack;
-                            }
-                        } else {
-                            if (!(xSel <= 1) && (CheckerBoard[xSel - 1][ySel + 1] == 2 || CheckerBoard[xSel - 1][ySel + 1] == 4) && (CheckerBoard[xSel - 2][ySel + 2] == 0 || cheatModeBlack)) {
-                                System.out.println("You must make a forced jump");
-                                CheckerBoard[xSel - 2][ySel + 2] = CheckerBoard[xSel][ySel];
-                                CheckerBoard[xSel - 1][ySel + 1] = 0;
-                                CheckerBoard[xSel][ySel] = 0;
-                                blackCaptured++;
-                                multiturn = true;
-                                xSel = xSel - 2;
-                                ySel = ySel + 2;
-                                break pieceMoveBlack;
-
-                            } else if (!(xSel <= 1) && (CheckerBoard[xSel - 1][ySel - 1] == 2 || CheckerBoard[xSel - 1][ySel - 1] == 4) && (CheckerBoard[xSel - 2][ySel - 2] == 0 || cheatModeBlack)) {
-                                System.out.println("You must make a forced jump");
-                                CheckerBoard[xSel - 2][ySel - 2] = CheckerBoard[xSel][ySel];
-                                CheckerBoard[xSel - 1][ySel - 1] = 0;
-                                CheckerBoard[xSel][ySel] = 0;
-                                blackCaptured++;
-                                multiturn = true;
-                                xSel = xSel - 2;
-                                ySel = ySel - 2;
-                                break pieceMoveBlack;
-                            } else if ((CheckerBoard[xSel][ySel] == 3 && !(xSel >= 6 || xSel <= 1)) //piece is a king AND xSel <= 5 (prevents out of bounds errors)
-                                    //this statement is placed first to abuse java logic rules, if the first condition isn't met it skips checking the rest, thereby avoiding an out of bounds error.
-                                    && // AND
-                                    ((CheckerBoard[xSel + 1][ySel + 1] == 2 || CheckerBoard[xSel + 1][ySel + 1] == 4) //adjacent piece is red's (can be jumped)
-                                            &&  //AND
-                                            (CheckerBoard[xSel + 2][ySel + 2] == 0 || cheatModeBlack)))  //destination spot is open OR cheatMode is enabled
-                            {
-                                System.out.println("You must make a forced jump");
-                                CheckerBoard[xSel + 2][ySel + 2] = CheckerBoard[xSel][ySel];
-                                CheckerBoard[xSel + 1][ySel + 1] = 0;
-                                CheckerBoard[xSel][ySel] = 0;
-                                blackCaptured++;
-                                multiturn = true;
-                                xSel = xSel + 2;
-                                ySel = ySel + 2;
-                                break pieceMoveBlack;
-                            } else if ((CheckerBoard[xSel][ySel] == 3 && !(xSel >= 6 || xSel <= 1)) && ((CheckerBoard[xSel + 1][ySel - 1] == 2 || CheckerBoard[xSel + 1][ySel - 1] == 4) && (CheckerBoard[xSel + 2][ySel - 2] == 0 || cheatModeBlack))) {
-                                System.out.println("You must make a forced jump");
-                                CheckerBoard[xSel + 2][ySel - 2] = CheckerBoard[xSel][ySel];
-                                CheckerBoard[xSel + 1][ySel - 1] = 0;
-                                CheckerBoard[xSel][ySel] = 0;
-                                blackCaptured++;
-                                multiturn = true;
-                                xSel = xSel + 2;
-                                ySel = ySel - 2;
-                                break pieceMoveBlack;
-                            }
-                        }
-                        if(multiturn){
-                            break masterBlack;
-                        }
-                        System.out.println("Input the coordinates of the spot you would like to move to, format 'x,y'");
-                        selectDest = true;
-                        try {
-                            while (true) {
-                                if(StdDraw.isMousePressed()){
-                                    break;
-                                }
-                            }
-                            xDest = xTherapyConversion(mouseX);
-                            yDest = yTherapyConversion(mouseY);
-                            System.out.println(xDest + ", " + yDest);
-                            while (true) {
-                                if(!StdDraw.isMousePressed()){
-                                    break; //wait for mouse to be unclicked to avoid double click
-                                }
-                            }
-                        }
-                        catch(NumberFormatException | StringIndexOutOfBoundsException e){
-                            System.out.println("You can only input coordinates in the format 'x,y'!");
-                        }
-
-                        if (((((CheckerBoard[xSel][ySel] == 3 && //if the piece is a king AND
-                                ((xDest == xSel - 1 || xDest == xSel + 1) && //destination x-coord is +/- 1 of the piece's x-coord AND
-                                        (yDest == ySel + 1 || yDest == ySel - 1))) //destination y-coord is +/- 1 of the piece's y-coord
-                                || // OR
-                                (xDest == xSel - 1 && //destination x-coord is -1 of piece's x-coord (piece is moving towards the other side) AND
-                                        (yDest == ySel + 1 || yDest == ySel - 1)))) //destination y-coord is +/- 1 of piece's y-coord
-                                && // AND
-                                CheckerBoard[xDest][yDest] == 0) //destination is empty
-                                || // OR
-                                cheatModeBlack) //cheatMode is enabled (skip destination checks)
-                        {
-                            CheckerBoard[xDest][yDest] = CheckerBoard[xSel][ySel];
-                            if(xSel != xDest && ySel != yDest) {
-                                CheckerBoard[xSel][ySel] = 0;
-                            }
-                            if (xDest == 0 && CheckerBoard[xDest][yDest] != 3) {
-                                System.out.println("Black piece at " + xDest + "," + yDest + " is now a king, and can move any direction");
-                                CheckerBoard[xDest][yDest] = 3;
-                            }
-                            break pieceMoveBlack;
-                        } else if(xSel == xDest && ySel == yDest) { } else {
-                            try {
-                                System.out.println("Invalid movement");
-                                notAllowed = true;
-                                misclick2 = true;
-                                System.out.println("Select new piece? '1' for yes, '0' for no");
-                                while (true){
-                                    System.out.println("backend, upper loop"); //these print statements are here
-                                    if(!misclick2){
-                                        System.out.println("backend, exited upper loop"); //because if I remove them
-                                        break;
+                                    //check if coords are invalid
+                                    int e = CheckerBoard[9][9];
+                                    if (cheatMode) {
+                                        System.out.println("Cheat mode toggled");
+                                        selectPiece = false;
+                                        cheatModeBlack = !cheatModeBlack;
+                                    } else if (mouseY > 600) {
+                                    } else if (CheckerBoard[xSel][ySel] == 2 || CheckerBoard[xSel][ySel] == 4) {
+                                        System.out.println("You can't move RED's pieces!");
+                                        selectPiece = false;
+                                        emptyBlack = false;
+                                        moveBlack = true;
+                                    } else if (CheckerBoard[xSel][ySel] == 0) {
+                                        System.out.println("You can't move an empty space!");
+                                        selectPiece = false;
+                                        moveBlack = false;
+                                        emptyBlack = true;
+                                    } else {
+                                        break pieceSelectBlack;
                                     }
+                                } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
+                                    System.out.println("You can only input coordinates in the format 'x,y'!");
                                 }
-                                if(misclick == 0){
-                                    System.out.println("misclick = 0");
-                                }
-                                if (misclick == 1) {
-                                    System.out.println("misclick = 1");
-                                    errorCheck = true;
+                            }
+                        }
+                        selectPiece = false;
+                        moveBlack = false;
+                        emptyBlack = false;
+                        pieceMoveBlack:
+                        while (true) { //pieceMoveBlack, destination select and jump loop
+                            if (ySel <= 1) {
+                                if (
+                                        !(xSel <= 1) //the piece is not in a corner (fixes out of bounds)
+                                                && //AND
+                                                (CheckerBoard[xSel - 1][ySel + 1] == 2 || CheckerBoard[xSel - 1][ySel + 1] == 4) //there is a jumpable piece that is RED's
+                                                && //AND
+                                                (CheckerBoard[xSel - 2][ySel + 2] == 0 || cheatModeBlack)) //the destination if the piece is jumped is open
+                                {
+                                    System.out.println("You must make a forced jump");
+                                    CheckerBoard[xSel - 2][ySel + 2] = CheckerBoard[xSel][ySel];
+                                    CheckerBoard[xSel - 1][ySel + 1] = 0;
+                                    CheckerBoard[xSel][ySel] = 0;
+                                    blackCaptured++;
+                                    multiturn = true;
+                                    xSel = xSel - 2;
+                                    ySel = ySel + 2;
                                     break pieceMoveBlack;
                                 }
-                                while (true){ //prevent lock
-                                    System.out.println("backend, lower loop"); //this section of code breaks
-                                    if(!StdDraw.isMousePressed()){
-                                        System.out.println("backend, exited lower loop"); //and I have no idea why (continued on red's side)
-                                        break;
-                                    }
+                                if (!(xSel >= 6) && (CheckerBoard[xSel + 1][ySel + 1] == 2 || CheckerBoard[xSel + 1][ySel + 1] == 4) && (CheckerBoard[xSel + 2][ySel + 2] == 0 || cheatModeBlack)) {
+                                    System.out.println("You must make a forced jump");
+                                    CheckerBoard[xSel + 2][ySel + 2] = CheckerBoard[xSel][ySel];
+                                    CheckerBoard[xSel + 1][ySel + 1] = 0;
+                                    CheckerBoard[xSel][ySel] = 0;
+                                    blackCaptured++;
+                                    multiturn = true;
+                                    xSel = xSel + 2;
+                                    ySel = ySel + 2;
+                                    break pieceMoveBlack;
+                                }
+                            } else if (ySel >= 6) {
+                                if (!(xSel <= 1) && (CheckerBoard[xSel - 1][ySel - 1] == 2 || CheckerBoard[xSel - 1][ySel - 1] == 4) && (CheckerBoard[xSel - 2][ySel - 2] == 0 || cheatModeBlack)) {
+                                    System.out.println("You must make a forced jump");
+                                    CheckerBoard[xSel - 2][ySel - 2] = CheckerBoard[xSel][ySel];
+                                    CheckerBoard[xSel - 1][ySel - 1] = 0;
+                                    CheckerBoard[xSel][ySel] = 0; //moves piece
+                                    blackCaptured++;
+                                    multiturn = true;
+                                    xSel = xSel - 2;
+                                    ySel = ySel - 2;
+                                    break pieceMoveBlack;
+                                }
+                                if ((CheckerBoard[xSel + 1][ySel - 1] == 2 || CheckerBoard[xSel + 1][ySel - 1] == 4) && (CheckerBoard[xSel + 2][ySel - 2] == 0 || cheatModeBlack)) {
+                                    System.out.println("You must make a forced jump");
+                                    CheckerBoard[xSel + 2][ySel - 2] = CheckerBoard[xSel][ySel];
+                                    CheckerBoard[xSel + 1][ySel - 1] = 0;
+                                    CheckerBoard[xSel][ySel] = 0; //moves piece
+                                    blackCaptured++;
+                                    multiturn = true;
+                                    xSel = xSel + 2;
+                                    ySel = ySel - 2;
+                                    break pieceMoveBlack;
+                                }
+                            } else {
+                                if (!(xSel <= 1) && (CheckerBoard[xSel - 1][ySel + 1] == 2 || CheckerBoard[xSel - 1][ySel + 1] == 4) && (CheckerBoard[xSel - 2][ySel + 2] == 0 || cheatModeBlack)) {
+                                    System.out.println("You must make a forced jump");
+                                    CheckerBoard[xSel - 2][ySel + 2] = CheckerBoard[xSel][ySel];
+                                    CheckerBoard[xSel - 1][ySel + 1] = 0;
+                                    CheckerBoard[xSel][ySel] = 0;
+                                    blackCaptured++;
+                                    multiturn = true;
+                                    xSel = xSel - 2;
+                                    ySel = ySel + 2;
+                                    break pieceMoveBlack;
+
+                                } else if (!(xSel <= 1) && (CheckerBoard[xSel - 1][ySel - 1] == 2 || CheckerBoard[xSel - 1][ySel - 1] == 4) && (CheckerBoard[xSel - 2][ySel - 2] == 0 || cheatModeBlack)) {
+                                    System.out.println("You must make a forced jump");
+                                    CheckerBoard[xSel - 2][ySel - 2] = CheckerBoard[xSel][ySel];
+                                    CheckerBoard[xSel - 1][ySel - 1] = 0;
+                                    CheckerBoard[xSel][ySel] = 0;
+                                    blackCaptured++;
+                                    multiturn = true;
+                                    xSel = xSel - 2;
+                                    ySel = ySel - 2;
+                                    break pieceMoveBlack;
+                                } else if ((CheckerBoard[xSel][ySel] == 3 && !(xSel >= 6 || xSel <= 1)) //piece is a king AND xSel <= 5 (prevents out of bounds errors)
+                                        //this statement is placed first to abuse java logic rules, if the first condition isn't met it skips checking the rest, thereby avoiding an out of bounds error.
+                                        && // AND
+                                        ((CheckerBoard[xSel + 1][ySel + 1] == 2 || CheckerBoard[xSel + 1][ySel + 1] == 4) //adjacent piece is red's (can be jumped)
+                                                &&  //AND
+                                                (CheckerBoard[xSel + 2][ySel + 2] == 0 || cheatModeBlack)))  //destination spot is open OR cheatMode is enabled
+                                {
+                                    System.out.println("You must make a forced jump");
+                                    CheckerBoard[xSel + 2][ySel + 2] = CheckerBoard[xSel][ySel];
+                                    CheckerBoard[xSel + 1][ySel + 1] = 0;
+                                    CheckerBoard[xSel][ySel] = 0;
+                                    blackCaptured++;
+                                    multiturn = true;
+                                    xSel = xSel + 2;
+                                    ySel = ySel + 2;
+                                    break pieceMoveBlack;
+                                } else if ((CheckerBoard[xSel][ySel] == 3 && !(xSel >= 6 || xSel <= 1)) && ((CheckerBoard[xSel + 1][ySel - 1] == 2 || CheckerBoard[xSel + 1][ySel - 1] == 4) && (CheckerBoard[xSel + 2][ySel - 2] == 0 || cheatModeBlack))) {
+                                    System.out.println("You must make a forced jump");
+                                    CheckerBoard[xSel + 2][ySel - 2] = CheckerBoard[xSel][ySel];
+                                    CheckerBoard[xSel + 1][ySel - 1] = 0;
+                                    CheckerBoard[xSel][ySel] = 0;
+                                    blackCaptured++;
+                                    multiturn = true;
+                                    xSel = xSel + 2;
+                                    ySel = ySel - 2;
+                                    break pieceMoveBlack;
                                 }
                             }
-                            catch(NumberFormatException | StringIndexOutOfBoundsException e){
-                                System.out.println("You can only input coordinates in the format 'x,y'!");
-                                //actually, the character in between the first and second numbers can be whatever you want
-                                //dont tell anyone
+                            if (multiturn) {
+                                break masterBlack;
                             }
-                        }
-                    }
-                    System.out.println(errorCheck);
-                    if(!multiturn && !errorCheck){
-                        break masterBlack;
-                    }
-                }
-                while (true) {
-                    if(!StdDraw.isMousePressed()){
-                        break; //wait for mouse to be unclicked to avoid double click
-                    }
-                }
-
-                selectDest = false;
-                blackTurn = false;
-                redTurn = true;
-
-                if(blackWon(CheckerBoard) || redWon(CheckerBoard)){
-                    break;
-                }
-            } else if (redTurn) {
-                multiturn = false;
-                printBoard(CheckerBoard, false);
-                System.out.println("It is " + ANSI_RED + "RED's" + ANSI_RESET + " turn");
-                masterRed:
-                while (true) {
-                    errorCheck = false;
-                    selectPiece = true;
-                    pieceSelectRed:
-                    while (true) { //piece select loop
-                        if(multiturn) {
-                            if (xSel == 7 && CheckerBoard[xSel][ySel] != 4) {
-                                System.out.println("Red piece at " + xSel + "," + ySel + " is now a king, and can move any direction");
-                                CheckerBoard[xSel][ySel] = 4;
-                            }
-                            break pieceSelectRed;
-                        } else {
-                            System.out.println("Input the coordinates of the piece you would like to move, format 'x,y'");
+                            System.out.println("Input the coordinates of the spot you would like to move to, format 'x,y'");
+                            selectDest = true;
                             try {
                                 while (true) {
-                                    if(StdDraw.isMousePressed()){
+                                    if (StdDraw.isMousePressed()) {
                                         break;
                                     }
                                 }
-                                xSel = xTherapyConversion(mouseX);
-                                ySel = yTherapyConversion(mouseY);
-                                System.out.println(xSel + ", " + ySel);
+                                xDest = xTherapyConversion(mouseX);
+                                yDest = yTherapyConversion(mouseY);
+                                System.out.println(xDest + ", " + yDest);
                                 while (true) {
-                                    if(!StdDraw.isMousePressed()){
+                                    if (!StdDraw.isMousePressed()) {
                                         break; //wait for mouse to be unclicked to avoid double click
-                                    }
-                                }
-
-                                if (cheatMode) {
-                                    System.out.println("Cheat mode toggled");
-                                    cheatModeRed = !cheatModeRed;
-                                    selectPiece = false;
-                                } else if(mouseY > 600){ } else if (CheckerBoard[xSel][ySel] == 1 || CheckerBoard[xSel][ySel] == 3) {
-                                    System.out.println("You cannot move BLACK's pieces!");
-                                    selectPiece = false;
-                                    emptyRed = false;
-                                    moveRed = true;
-                                } else if (CheckerBoard[xSel][ySel] == 0) {
-                                    System.out.println("You cannot move an empty space");
-                                    selectPiece = false;
-                                    moveRed = false;
-                                    emptyRed = true;
-                                } else {
-                                    break pieceSelectRed;
-                                }
-                            }
-                            catch(NumberFormatException | StringIndexOutOfBoundsException e){
-                                System.out.println("You can only input coordinates in the format 'x,y'!");
-                            }
-                        }
-                    }
-                    selectPiece = false;
-                    moveRed = false;
-                    emptyRed = false;
-                    pieceMoveRed:
-                    while (true) { // destination select loop
-                        if (ySel <= 1) {
-                            if (!(xSel >= 6) && (CheckerBoard[xSel + 1][ySel + 1] == 1 || CheckerBoard[xSel + 1][ySel + 1] == 3) && CheckerBoard[xSel + 2][ySel + 2] == 0) {
-                                System.out.println("You must make a forced jump");
-                                CheckerBoard[xSel + 2][ySel + 2] = CheckerBoard[xSel][ySel];
-                                CheckerBoard[xSel + 1][ySel + 1] = 0;
-                                CheckerBoard[xSel][ySel] = 0;
-                                redCaptured++;
-                                multiturn = true;
-                                xSel = xSel + 2;
-                                ySel = ySel + 2;
-                                break pieceMoveRed;
-                            } else if ((xSel > 1) && ((CheckerBoard[xSel - 1][ySel + 1] == 1 || CheckerBoard[xSel - 1][ySel + 1] == 3) && CheckerBoard[xSel - 2][ySel + 2] == 0) && CheckerBoard[xSel][ySel] == 4) {
-                                System.out.println("You must make a forced jump");
-                                CheckerBoard[xSel - 2][ySel + 2] = CheckerBoard[xSel][ySel];
-                                CheckerBoard[xSel - 1][ySel + 1] = 0;
-                                CheckerBoard[xSel][ySel] = 0;
-                                redCaptured++;
-                                multiturn = true;
-                                xSel = xSel - 2;
-                                ySel = ySel + 2;
-                                break pieceMoveRed;
-                            }
-                        } else if (ySel >= 6) {
-                            if (CheckerBoard[xSel][ySel] == 4 && (xSel >= 1 && (CheckerBoard[xSel - 1][ySel - 1] == 1 || CheckerBoard[xSel - 1][ySel - 1] == 3) && (CheckerBoard[xSel - 2][ySel - 2] == 0 || cheatModeRed))) {
-                                System.out.println("You must make a forced jump");
-                                CheckerBoard[xSel - 2][ySel - 2] = CheckerBoard[xSel][ySel];
-                                CheckerBoard[xSel - 1][ySel - 1] = 0;
-                                CheckerBoard[xSel][ySel] = 0;
-                                redCaptured++;
-                                multiturn = true;
-                                xSel = xSel - 2;
-                                ySel = ySel - 2;
-                                break pieceMoveRed;
-                            }
-                            if (!(xSel >= 6) && (CheckerBoard[xSel + 1][ySel - 1] == 1 || CheckerBoard[xSel + 1][ySel - 1] == 3) && (CheckerBoard[xSel + 2][ySel - 2] == 0 || cheatModeRed)) {
-                                System.out.println("You must make a forced jump");
-                                CheckerBoard[xSel + 2][ySel - 2] = CheckerBoard[xSel][ySel];
-                                CheckerBoard[xSel + 1][ySel - 1] = 0;
-                                CheckerBoard[xSel][ySel] = 0;
-                                redCaptured++;
-                                multiturn = true;
-                                xSel = xSel + 2;
-                                ySel = ySel - 2;
-                                break pieceMoveRed;
-                            }
-                        } else {
-                            if (!(xSel >= 6) && (CheckerBoard[xSel + 1][ySel + 1] == 1 || CheckerBoard[xSel + 1][ySel + 1] == 3) && (CheckerBoard[xSel + 2][ySel + 2] == 0 || cheatModeRed)) {
-                                System.out.println("You must make a forced jump");
-                                CheckerBoard[xSel + 2][ySel + 2] = CheckerBoard[xSel][ySel];
-                                CheckerBoard[xSel + 1][ySel + 1] = 0;
-                                CheckerBoard[xSel][ySel] = 0;
-                                redCaptured++;
-                                multiturn = true;
-                                xSel = xSel + 2;
-                                ySel = ySel + 2;
-                                break pieceMoveRed;
-                            } else if (!(xSel >= 6) && (CheckerBoard[xSel + 1][ySel - 1] == 1 || CheckerBoard[xSel + 1][ySel - 1] == 3) && (CheckerBoard[xSel + 2][ySel - 2] == 0 || cheatModeRed)) {
-                                System.out.println("You must make a forced jump");
-                                CheckerBoard[xSel + 2][ySel - 2] = CheckerBoard[xSel][ySel];
-                                CheckerBoard[xSel + 1][ySel - 1] = 0;
-                                CheckerBoard[xSel][ySel] = 0;
-                                redCaptured++;
-                                multiturn = true;
-                                xSel = xSel + 2;
-                                ySel = ySel - 2;
-                                break pieceMoveRed;
-                            } else if ((CheckerBoard[xSel][ySel] == 4 && !(xSel <= 1 || xSel >= 6)) && ((CheckerBoard[xSel - 1][ySel + 1] == 1 || CheckerBoard[xSel - 1][ySel + 1] == 3) && (CheckerBoard[xSel - 2][ySel + 2] == 0 || cheatModeRed))) {
-                                System.out.println("You must make a forced jump");
-                                CheckerBoard[xSel - 2][ySel + 2] = CheckerBoard[xSel][ySel];
-                                CheckerBoard[xSel - 1][ySel + 1] = 0;
-                                CheckerBoard[xSel][ySel] = 0;
-                                redCaptured++;
-                                multiturn = true;
-                                xSel = xSel - 2;
-                                ySel = ySel + 2;
-                                break pieceMoveRed;
-                            } else if ((CheckerBoard[xSel][ySel] == 4 && !(xSel <= 1 || xSel >= 6)) && ((CheckerBoard[xSel - 1][ySel - 1] == 1 || CheckerBoard[xSel - 1][ySel - 1] == 3) && (CheckerBoard[xSel - 2][ySel - 2] == 0 || cheatModeRed))) {
-                                System.out.println("You must make a forced jump");
-                                CheckerBoard[xSel - 2][ySel - 2] = CheckerBoard[xSel][ySel];
-                                CheckerBoard[xSel - 1][ySel - 1] = 0;
-                                CheckerBoard[xSel][ySel] = 0;
-                                redCaptured++;
-                                multiturn = true;
-                                xSel = xSel - 2;
-                                ySel = ySel - 2;
-                                break pieceMoveRed;
-                            }
-                        }
-                        if (multiturn) {
-                            break masterRed;
-                        }
-                        System.out.println("Input the coordinates of the spot you would like to move to, format 'x,y'");
-                        selectDest = true;
-                        try {
-                            while (true) {
-                                if(StdDraw.isMousePressed()){
-                                    break;
-                                }
-                            }
-                            xDest = xTherapyConversion(mouseX);
-                            yDest = yTherapyConversion(mouseY);
-                            System.out.println(xDest + ", " + yDest);
-                            while (true) {
-                                if(!StdDraw.isMousePressed()){
-                                    break; //wait for mouse to be unclicked to avoid double click
-                                }
-                            }
-                        } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
-                            System.out.println("You can only input coordinates in the format 'x,y'!");
-                        }
-                        if ((((CheckerBoard[xSel][ySel] == 4 && //if the piece is a king AND
-                                ((xDest == xSel - 1 || xDest == xSel + 1) && //destination x-coord is +/- 1 of the piece's x-coord AND
-                                        (yDest == ySel + 1 || yDest == ySel - 1))) //destination y-coord is +/- 1 of the piece's y-coord
-                                || // OR
-                                (xDest == xSel + 1 && //destination x-coord is +1 of piece's x-coord (piece is moving towards the other side) AND
-                                        (yDest == ySel + 1 || yDest == ySel - 1))) //destination y-coord is +/- 1 of piece's y-coord
-                                && // AND
-                                CheckerBoard[xDest][yDest] == 0) //destination is empty
-                                || // OR
-                                cheatModeRed) //cheatMode is enabled (skip destination checks)
-                        {
-                            CheckerBoard[xDest][yDest] = CheckerBoard[xSel][ySel];
-                            if(xSel != xDest && ySel != yDest) {
-                                CheckerBoard[xSel][ySel] = 0;
-                            }
-                            if (xDest == 7) {
-                                System.out.println("Red piece at " + xDest + "," + yDest + " is now a king, and can move any direction");
-                                CheckerBoard[xDest][yDest] = 4;
-                            }
-                            break pieceMoveRed;
-                        } else if(xSel == xDest && ySel == yDest) { } else {
-                            try {
-                                System.out.println("Invalid movement");
-                                misclick2 = true;
-                                System.out.println("Select new piece? '1' for yes, '0' for no");
-                                while (true){
-                                    System.out.println("backend, upper loop"); //if I remove them, the code gets stuck
-                                    if(!misclick2){
-                                        System.out.println("backend, exited upper loop"); //so here they stay
-                                        break;
-                                    }
-                                }
-                                if(misclick == 0){
-                                    System.out.println("misclick = 0");
-                                }
-                                if (misclick == 1) {
-                                    System.out.println("misclick = 1");
-                                    errorCheck = true;
-                                    break pieceMoveRed;
-                                }
-                                while (true){ //prevent lock
-                                    System.out.println("backend, lower loop"); //sorry about the spam in your terminal output
-                                    if(!StdDraw.isMousePressed()){
-                                        System.out.println("backend, exited lower loop"); //-WhitetailAni
-                                        break;
                                     }
                                 }
                             } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
                                 System.out.println("You can only input coordinates in the format 'x,y'!");
                             }
+
+                            if (((((CheckerBoard[xSel][ySel] == 3 && //if the piece is a king AND
+                                    ((xDest == xSel - 1 || xDest == xSel + 1) && //destination x-coord is +/- 1 of the piece's x-coord AND
+                                            (yDest == ySel + 1 || yDest == ySel - 1))) //destination y-coord is +/- 1 of the piece's y-coord
+                                    || // OR
+                                    (xDest == xSel - 1 && //destination x-coord is -1 of piece's x-coord (piece is moving towards the other side) AND
+                                            (yDest == ySel + 1 || yDest == ySel - 1)))) //destination y-coord is +/- 1 of piece's y-coord
+                                    && // AND
+                                    CheckerBoard[xDest][yDest] == 0) //destination is empty
+                                    || // OR
+                                    cheatModeBlack) //cheatMode is enabled (skip destination checks)
+                            {
+                                CheckerBoard[xDest][yDest] = CheckerBoard[xSel][ySel];
+                                if (xSel != xDest && ySel != yDest) {
+                                    CheckerBoard[xSel][ySel] = 0;
+                                }
+                                if (xDest == 0 && CheckerBoard[xDest][yDest] != 3) {
+                                    System.out.println("Black piece at " + xDest + "," + yDest + " is now a king, and can move any direction");
+                                    CheckerBoard[xDest][yDest] = 3;
+                                }
+                                break pieceMoveBlack;
+                            } else if (xSel == xDest && ySel == yDest) {
+                            } else {
+                                try {
+                                    System.out.println("Invalid movement");
+                                    notAllowed = true;
+                                    misclick2 = true;
+                                    System.out.println("Select new piece? '1' for yes, '0' for no");
+                                    while (true) {
+                                        System.out.println("backend, upper loop"); //these print statements are here
+                                        if (!misclick2) {
+                                            System.out.println("backend, exited upper loop"); //because if I remove them
+                                            break;
+                                        }
+                                    }
+                                    if (misclick == 0) {
+                                        System.out.println("misclick = 0");
+                                    }
+                                    if (misclick == 1) {
+                                        System.out.println("misclick = 1");
+                                        errorCheck = true;
+                                        break pieceMoveBlack;
+                                    }
+                                    while (true) { //prevent lock
+                                        System.out.println("backend, lower loop"); //this section of code breaks
+                                        if (!StdDraw.isMousePressed()) {
+                                            System.out.println("backend, exited lower loop"); //and I have no idea why (continued on red's side)
+                                            break;
+                                        }
+                                    }
+                                } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
+                                    System.out.println("You can only input coordinates in the format 'x,y'!");
+                                    //actually, the character in between the first and second numbers can be whatever you want
+                                    //dont tell anyone
+                                }
+                            }
+                        }
+                        System.out.println(errorCheck);
+                        if (!multiturn && !errorCheck) {
+                            break masterBlack;
                         }
                     }
-                    if(!multiturn && !errorCheck){
-                        break masterRed;
+                    while (true) {
+                        if (!StdDraw.isMousePressed()) {
+                            break; //wait for mouse to be unclicked to avoid double click
+                        }
                     }
+
+                    selectDest = false;
+                    blackTurn = false;
+                    redTurn = true;
+
+                    if (blackWon(CheckerBoard) || redWon(CheckerBoard)) {
+                        break;
+                    }
+                } else if (redTurn) {
+                    multiturn = false;
+                    printBoard(CheckerBoard, false);
+                    System.out.println("It is " + ANSI_RED + "RED's" + ANSI_RESET + " turn");
+                    masterRed:
+                    while (true) {
+                        errorCheck = false;
+                        selectPiece = true;
+                        pieceSelectRed:
+                        while (true) { //piece select loop
+                            if (multiturn) {
+                                if (xSel == 7 && CheckerBoard[xSel][ySel] != 4) {
+                                    System.out.println("Red piece at " + xSel + "," + ySel + " is now a king, and can move any direction");
+                                    CheckerBoard[xSel][ySel] = 4;
+                                }
+                                break pieceSelectRed;
+                            } else {
+                                System.out.println("Input the coordinates of the piece you would like to move, format 'x,y'");
+                                try {
+                                    while (true) {
+                                        if (StdDraw.isMousePressed()) {
+                                            break;
+                                        }
+                                    }
+                                    xSel = xTherapyConversion(mouseX);
+                                    ySel = yTherapyConversion(mouseY);
+                                    System.out.println(xSel + ", " + ySel);
+                                    while (true) {
+                                        if (!StdDraw.isMousePressed()) {
+                                            break; //wait for mouse to be unclicked to avoid double click
+                                        }
+                                    }
+
+                                    if (cheatMode) {
+                                        System.out.println("Cheat mode toggled");
+                                        cheatModeRed = !cheatModeRed;
+                                        selectPiece = false;
+                                    } else if (mouseY > 600) {
+                                    } else if (CheckerBoard[xSel][ySel] == 1 || CheckerBoard[xSel][ySel] == 3) {
+                                        System.out.println("You cannot move BLACK's pieces!");
+                                        selectPiece = false;
+                                        emptyRed = false;
+                                        moveRed = true;
+                                    } else if (CheckerBoard[xSel][ySel] == 0) {
+                                        System.out.println("You cannot move an empty space");
+                                        selectPiece = false;
+                                        moveRed = false;
+                                        emptyRed = true;
+                                    } else {
+                                        break pieceSelectRed;
+                                    }
+                                } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
+                                    System.out.println("You can only input coordinates in the format 'x,y'!");
+                                }
+                            }
+                        }
+                        selectPiece = false;
+                        moveRed = false;
+                        emptyRed = false;
+                        pieceMoveRed:
+                        while (true) { // destination select loop
+                            if (ySel <= 1) {
+                                if (!(xSel >= 6) && (CheckerBoard[xSel + 1][ySel + 1] == 1 || CheckerBoard[xSel + 1][ySel + 1] == 3) && CheckerBoard[xSel + 2][ySel + 2] == 0) {
+                                    System.out.println("You must make a forced jump");
+                                    CheckerBoard[xSel + 2][ySel + 2] = CheckerBoard[xSel][ySel];
+                                    CheckerBoard[xSel + 1][ySel + 1] = 0;
+                                    CheckerBoard[xSel][ySel] = 0;
+                                    redCaptured++;
+                                    multiturn = true;
+                                    xSel = xSel + 2;
+                                    ySel = ySel + 2;
+                                    break pieceMoveRed;
+                                } else if ((xSel > 1) && ((CheckerBoard[xSel - 1][ySel + 1] == 1 || CheckerBoard[xSel - 1][ySel + 1] == 3) && CheckerBoard[xSel - 2][ySel + 2] == 0) && CheckerBoard[xSel][ySel] == 4) {
+                                    System.out.println("You must make a forced jump");
+                                    CheckerBoard[xSel - 2][ySel + 2] = CheckerBoard[xSel][ySel];
+                                    CheckerBoard[xSel - 1][ySel + 1] = 0;
+                                    CheckerBoard[xSel][ySel] = 0;
+                                    redCaptured++;
+                                    multiturn = true;
+                                    xSel = xSel - 2;
+                                    ySel = ySel + 2;
+                                    break pieceMoveRed;
+                                }
+                            } else if (ySel >= 6) {
+                                if (CheckerBoard[xSel][ySel] == 4 && (xSel >= 1 && (CheckerBoard[xSel - 1][ySel - 1] == 1 || CheckerBoard[xSel - 1][ySel - 1] == 3) && (CheckerBoard[xSel - 2][ySel - 2] == 0 || cheatModeRed))) {
+                                    System.out.println("You must make a forced jump");
+                                    CheckerBoard[xSel - 2][ySel - 2] = CheckerBoard[xSel][ySel];
+                                    CheckerBoard[xSel - 1][ySel - 1] = 0;
+                                    CheckerBoard[xSel][ySel] = 0;
+                                    redCaptured++;
+                                    multiturn = true;
+                                    xSel = xSel - 2;
+                                    ySel = ySel - 2;
+                                    break pieceMoveRed;
+                                }
+                                if (!(xSel >= 6) && (CheckerBoard[xSel + 1][ySel - 1] == 1 || CheckerBoard[xSel + 1][ySel - 1] == 3) && (CheckerBoard[xSel + 2][ySel - 2] == 0 || cheatModeRed)) {
+                                    System.out.println("You must make a forced jump");
+                                    CheckerBoard[xSel + 2][ySel - 2] = CheckerBoard[xSel][ySel];
+                                    CheckerBoard[xSel + 1][ySel - 1] = 0;
+                                    CheckerBoard[xSel][ySel] = 0;
+                                    redCaptured++;
+                                    multiturn = true;
+                                    xSel = xSel + 2;
+                                    ySel = ySel - 2;
+                                    break pieceMoveRed;
+                                }
+                            } else {
+                                if (!(xSel >= 6) && (CheckerBoard[xSel + 1][ySel + 1] == 1 || CheckerBoard[xSel + 1][ySel + 1] == 3) && (CheckerBoard[xSel + 2][ySel + 2] == 0 || cheatModeRed)) {
+                                    System.out.println("You must make a forced jump");
+                                    CheckerBoard[xSel + 2][ySel + 2] = CheckerBoard[xSel][ySel];
+                                    CheckerBoard[xSel + 1][ySel + 1] = 0;
+                                    CheckerBoard[xSel][ySel] = 0;
+                                    redCaptured++;
+                                    multiturn = true;
+                                    xSel = xSel + 2;
+                                    ySel = ySel + 2;
+                                    break pieceMoveRed;
+                                } else if (!(xSel >= 6) && (CheckerBoard[xSel + 1][ySel - 1] == 1 || CheckerBoard[xSel + 1][ySel - 1] == 3) && (CheckerBoard[xSel + 2][ySel - 2] == 0 || cheatModeRed)) {
+                                    System.out.println("You must make a forced jump");
+                                    CheckerBoard[xSel + 2][ySel - 2] = CheckerBoard[xSel][ySel];
+                                    CheckerBoard[xSel + 1][ySel - 1] = 0;
+                                    CheckerBoard[xSel][ySel] = 0;
+                                    redCaptured++;
+                                    multiturn = true;
+                                    xSel = xSel + 2;
+                                    ySel = ySel - 2;
+                                    break pieceMoveRed;
+                                } else if ((CheckerBoard[xSel][ySel] == 4 && !(xSel <= 1 || xSel >= 6)) && ((CheckerBoard[xSel - 1][ySel + 1] == 1 || CheckerBoard[xSel - 1][ySel + 1] == 3) && (CheckerBoard[xSel - 2][ySel + 2] == 0 || cheatModeRed))) {
+                                    System.out.println("You must make a forced jump");
+                                    CheckerBoard[xSel - 2][ySel + 2] = CheckerBoard[xSel][ySel];
+                                    CheckerBoard[xSel - 1][ySel + 1] = 0;
+                                    CheckerBoard[xSel][ySel] = 0;
+                                    redCaptured++;
+                                    multiturn = true;
+                                    xSel = xSel - 2;
+                                    ySel = ySel + 2;
+                                    break pieceMoveRed;
+                                } else if ((CheckerBoard[xSel][ySel] == 4 && !(xSel <= 1 || xSel >= 6)) && ((CheckerBoard[xSel - 1][ySel - 1] == 1 || CheckerBoard[xSel - 1][ySel - 1] == 3) && (CheckerBoard[xSel - 2][ySel - 2] == 0 || cheatModeRed))) {
+                                    System.out.println("You must make a forced jump");
+                                    CheckerBoard[xSel - 2][ySel - 2] = CheckerBoard[xSel][ySel];
+                                    CheckerBoard[xSel - 1][ySel - 1] = 0;
+                                    CheckerBoard[xSel][ySel] = 0;
+                                    redCaptured++;
+                                    multiturn = true;
+                                    xSel = xSel - 2;
+                                    ySel = ySel - 2;
+                                    break pieceMoveRed;
+                                }
+                            }
+                            if (multiturn) {
+                                break masterRed;
+                            }
+                            System.out.println("Input the coordinates of the spot you would like to move to, format 'x,y'");
+                            selectDest = true;
+                            try {
+                                while (true) {
+                                    if (StdDraw.isMousePressed()) {
+                                        break;
+                                    }
+                                }
+                                xDest = xTherapyConversion(mouseX);
+                                yDest = yTherapyConversion(mouseY);
+                                System.out.println(xDest + ", " + yDest);
+                                while (true) {
+                                    if (!StdDraw.isMousePressed()) {
+                                        break; //wait for mouse to be unclicked to avoid double click
+                                    }
+                                }
+                            } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
+                                System.out.println("You can only input coordinates in the format 'x,y'!");
+                            }
+                            if ((((CheckerBoard[xSel][ySel] == 4 && //if the piece is a king AND
+                                    ((xDest == xSel - 1 || xDest == xSel + 1) && //destination x-coord is +/- 1 of the piece's x-coord AND
+                                            (yDest == ySel + 1 || yDest == ySel - 1))) //destination y-coord is +/- 1 of the piece's y-coord
+                                    || // OR
+                                    (xDest == xSel + 1 && //destination x-coord is +1 of piece's x-coord (piece is moving towards the other side) AND
+                                            (yDest == ySel + 1 || yDest == ySel - 1))) //destination y-coord is +/- 1 of piece's y-coord
+                                    && // AND
+                                    CheckerBoard[xDest][yDest] == 0) //destination is empty
+                                    || // OR
+                                    cheatModeRed) //cheatMode is enabled (skip destination checks)
+                            {
+                                CheckerBoard[xDest][yDest] = CheckerBoard[xSel][ySel];
+                                if (xSel != xDest && ySel != yDest) {
+                                    CheckerBoard[xSel][ySel] = 0;
+                                }
+                                if (xDest == 7) {
+                                    System.out.println("Red piece at " + xDest + "," + yDest + " is now a king, and can move any direction");
+                                    CheckerBoard[xDest][yDest] = 4;
+                                }
+                                break pieceMoveRed;
+                            } else if (xSel == xDest && ySel == yDest) {
+                            } else {
+                                try {
+                                    System.out.println("Invalid movement");
+                                    misclick2 = true;
+                                    System.out.println("Select new piece? '1' for yes, '0' for no");
+                                    while (true) {
+                                        System.out.println("backend, upper loop"); //if I remove them, the code gets stuck
+                                        if (!misclick2) {
+                                            System.out.println("backend, exited upper loop"); //so here they stay
+                                            break;
+                                        }
+                                    }
+                                    if (misclick == 0) {
+                                        System.out.println("misclick = 0");
+                                    }
+                                    if (misclick == 1) {
+                                        System.out.println("misclick = 1");
+                                        errorCheck = true;
+                                        break pieceMoveRed;
+                                    }
+                                    while (true) { //prevent lock
+                                        System.out.println("backend, lower loop"); //sorry about the spam in your terminal output
+                                        if (!StdDraw.isMousePressed()) {
+                                            System.out.println("backend, exited lower loop"); //-WhitetailAni
+                                            break;
+                                        }
+                                    }
+                                } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
+                                    System.out.println("You can only input coordinates in the format 'x,y'!");
+                                }
+                            }
+                        }
+                        if (!multiturn && !errorCheck) {
+                            break masterRed;
+                        }
+                    }
+                    selectDest = false;
+                    redTurn = false;
+                    blackTurn = true;
                 }
-                selectDest = false;
-                redTurn = false;
-                blackTurn = true;
+                if (blackWon(CheckerBoard) || redWon(CheckerBoard)) { //if game is won, break loop
+                    break;
+                }
             }
-            if(blackWon(CheckerBoard) || redWon(CheckerBoard)){ //if game is won, break loop
-                break;
-            }
+        }
+        catch(ArrayIndexOutOfBoundsException e){
+            errorMessage = e.toString();
+            errorCheck = true;
         }
         if(blackWon(CheckerBoard)){
             blackWins = true;
