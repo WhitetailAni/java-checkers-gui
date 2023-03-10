@@ -29,6 +29,8 @@ public class watchdog extends GUI {
                 selectPiece = true;
             }
         }
-        catch (InterruptedException e){ }
+        catch (InterruptedException e){
+            //big things brewing!
+        }
     }
 }
