@@ -348,7 +348,7 @@ public class backend {
                     if (blackWon(CheckerBoard) || redWon(CheckerBoard)) {
                         break;
                     }
-                } else if (redTurn) {
+                } else if (redTurn && args[0].equals("multi")) {
                     multiturn = false;
                     printBoard(CheckerBoard, false);
                     System.out.println("It is " + ANSI_RED + "RED's" + ANSI_RESET + " turn");
@@ -558,6 +558,8 @@ public class backend {
                     selectDest = false;
                     redTurn = false;
                     blackTurn = true;
+                } else if(redTurn && args[0].equals("single")){
+                    //AI goes here
                 }
                 if (blackWon(CheckerBoard) || redWon(CheckerBoard)) { //if game is won, break loop
                     break;

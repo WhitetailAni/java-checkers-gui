@@ -20,44 +20,51 @@ public class GUI extends backend {
         StdDraw.setYscale(0, 655);
         StdDraw.enableDoubleBuffering();
 
-        //resources for drawing board
-        boolean altColor = false; //switches colors when drawing rectangles
-
         //resources for title bar
         Font title = new Font("Sans Serif", Font.BOLD, 30);
         Font alert = new Font("Sans Serif", Font.BOLD, 20);
         Font captured = new Font("Helvetica", Font.BOLD, 15);
         Font inBetween = new Font("Sans Serif", Font.BOLD, 25);
 
-        backendRun(); //runs the backend of checkers
+        double xGuiPos = -37.5;
+        double yGuiPos = 37.5;
 
-       while (true) {
+
+        //intro loop
+        while (true) {
+            //show board then darken it
+            boardBG(xGuiPos, yGuiPos);
+            screenTint();
+
+            //mode select screen
+            StdDraw.setPenColor(StdDraw.WHITE);
+            StdDraw.filledRectangle(300,300,225,150);
+            StdDraw.setPenColor(StdDraw.BLACK);
+            StdDraw.setFont(alert);
+            StdDraw.filledRectangle(300,190,225,2.5);
+            StdDraw.text(300,167.5,"Quit");
+            if((450 >= mouseX && mouseX >= 150)){
+                System.exit(0);
+            }
+            StdDraw.show();
+            StdDraw.pause((int) (timeElapsed * 1000));
+            StdDraw.clear();
+            try {
+                Thread.sleep(200000);
+            }
+            catch(InterruptedException ignored) { }
+            break;
+        }
+        backendRun(1);
+
+        //gameloop
+        while (true) {
 
             //this has to be in the while loop
-            double xGuiPos = -37.5;
-            double yGuiPos = 37.5;
 
             StdDraw.setPenColor(customRed);
             //set up board background
-            for(int i=0; i<10; i++){
-                for(int j=0; j<10; j++) {
-                    StdDraw.filledRectangle(xGuiPos, yGuiPos, 37.5, 37.5);
-                    if (altColor) {
-                        StdDraw.setPenColor(StdDraw.BOOK_RED); //COLORS NOT FINAL
-                    } else {
-                        StdDraw.setPenColor(StdDraw.ORANGE);
-                    }
-                    altColor = !altColor;
-                    xGuiPos += 75;
-                }
-                yGuiPos += 75;
-                xGuiPos = -37.5;
-                altColor = !altColor;
-            }
-            StdDraw.setPenColor(StdDraw.BLACK);
-            StdDraw.filledRectangle(300, 602.5, 300, 2.5);
-            StdDraw.setPenColor(57, 191, 182);
-            StdDraw.filledRectangle(300,630,300,25);
+            boardBG(xGuiPos, yGuiPos);
 
             //display current turn
             if(redTurn){
@@ -71,63 +78,63 @@ public class GUI extends backend {
             }
 
             //show alerts
-           if (!misclick2) { //misclick prompt needs to override everything else rendered
-               if (blackTurn) {
-                   if (cheatMode) {
-                       StdDraw.setFont(inBetween);
-                       StdDraw.text(300, 627, "Cheat mode toggled");
-                   } else if (selectPiece) {
-                       StdDraw.setFont(alert);
-                       StdDraw.text(300, 638, "It is BLACK's turn");
-                       StdDraw.text(300, 617, "Select a piece to move");
-                   } else if (selectDest) {
-                       StdDraw.setFont(alert);
-                       StdDraw.text(300, 638, "It is BLACK's turn");
-                       StdDraw.text(300, 617, "Select the destination");
-                   } else if (moveBlack) {
-                       StdDraw.setFont(alert);
-                       StdDraw.text(300, 638, "You can't move");
-                       StdDraw.text(300, 617, "RED's pieces!");
-                   } else if (emptyBlack) {
-                       StdDraw.setFont(alert);
-                       StdDraw.text(300, 638, "You can't move");
-                       StdDraw.text(300, 617, "an empty space!");
-                   } else {
-                       StdDraw.setFont(title);
-                       StdDraw.text(300, 625, "It is BLACK's turn");
-                   }
-                   if (cheatModeBlack) {
-                       StdDraw.picture(12, 617, "checkra1n.png");
-                   }
-               } else if (redTurn) {
-                   if (cheatMode) {
-                       StdDraw.setFont(inBetween);
-                       StdDraw.text(300, 627, "Cheat mode toggled");
-                   } else if (selectPiece) {
-                       StdDraw.setFont(alert);
-                       StdDraw.text(300, 638, "It is RED's turn");
-                       StdDraw.text(300, 617, "Select a piece to move");
-                   } else if (selectDest) {
-                       StdDraw.setFont(alert);
-                       StdDraw.text(300, 638, "It is RED's turn");
-                       StdDraw.text(300, 617, "Select the destination");
-                   } else if (moveRed) {
-                       StdDraw.setFont(alert);
-                       StdDraw.text(300, 638, "You can't move");
-                       StdDraw.text(300, 617, "BLACK's pieces!");
-                   } else if (emptyRed) {
-                       StdDraw.setFont(alert);
-                       StdDraw.text(300, 638, "You can't move");
-                       StdDraw.text(300, 617, "an empty space!");
-                   } else {
-                       StdDraw.setFont(title);
-                       StdDraw.text(300, 625, "It is RED's turn");
-                   }
-                   if (cheatModeRed) {
-                       StdDraw.picture(12, 617, "checkra1n.png");
-                   }
-               }
-               watchdogRun();
+            if (!misclick2) { //misclick prompt needs to override everything else rendered
+                if (blackTurn) {
+                    if (cheatMode) {
+                        StdDraw.setFont(inBetween);
+                        StdDraw.text(300, 627, "Cheat mode toggled");
+                    } else if (selectPiece) {
+                        StdDraw.setFont(alert);
+                        StdDraw.text(300, 638, "It is BLACK's turn");
+                        StdDraw.text(300, 617, "Select a piece to move");
+                    } else if (selectDest) {
+                        StdDraw.setFont(alert);
+                        StdDraw.text(300, 638, "It is BLACK's turn");
+                        StdDraw.text(300, 617, "Select the destination");
+                    } else if (moveBlack) {
+                        StdDraw.setFont(alert);
+                        StdDraw.text(300, 638, "You can't move");
+                        StdDraw.text(300, 617, "RED's pieces!");
+                    } else if (emptyBlack) {
+                        StdDraw.setFont(alert);
+                        StdDraw.text(300, 638, "You can't move");
+                        StdDraw.text(300, 617, "an empty space!");
+                    } else {
+                        StdDraw.setFont(title);
+                        StdDraw.text(300, 625, "It is BLACK's turn");
+                    }
+                    if (cheatModeBlack) {
+                        StdDraw.picture(12, 617, "checkra1n.png");
+                    }
+                } else if (redTurn) {
+                    if (cheatMode) {
+                        StdDraw.setFont(inBetween);
+                        StdDraw.text(300, 627, "Cheat mode toggled");
+                    } else if (selectPiece) {
+                        StdDraw.setFont(alert);
+                        StdDraw.text(300, 638, "It is RED's turn");
+                        StdDraw.text(300, 617, "Select a piece to move");
+                    } else if (selectDest) {
+                        StdDraw.setFont(alert);
+                        StdDraw.text(300, 638, "It is RED's turn");
+                        StdDraw.text(300, 617, "Select the destination");
+                    } else if (moveRed) {
+                        StdDraw.setFont(alert);
+                        StdDraw.text(300, 638, "You can't move");
+                        StdDraw.text(300, 617, "BLACK's pieces!");
+                    } else if (emptyRed) {
+                        StdDraw.setFont(alert);
+                        StdDraw.text(300, 638, "You can't move");
+                        StdDraw.text(300, 617, "an empty space!");
+                    } else {
+                        StdDraw.setFont(title);
+                        StdDraw.text(300, 625, "It is RED's turn");
+                    }
+                    if (cheatModeRed) {
+                        StdDraw.picture(12, 617, "checkra1n.png");
+                    }
+                }
+                watchdogRun();
 
                     //display captured pieces
                     StdDraw.setFont(captured);
@@ -170,10 +177,10 @@ public class GUI extends backend {
                     }
                 }
 
-            //if(StdDraw.isMousePressed()) {//current mouse coordinates
-            //    System.out.println("MouseX is at " + mouseY);
-            //    System.out.println("MouseY is at " + mouseX);
-            //}
+            /*if(StdDraw.isMousePressed()) {//current mouse coordinates
+                System.out.println("MouseX is at " + mouseY);
+                System.out.println("MouseY is at " + mouseX);
+            }*/
 
             //update state of checkerboard
             for (int i=0; i<CheckerBoard.length; i++) {
@@ -202,28 +209,24 @@ public class GUI extends backend {
                 StdDraw.picture(xConversionTherapy(ySel),yConversionTherapy(xSel)-king, "crosshair.png",xScale,yScale);
             }
 
-            mouseX = StdDraw.mouseY(); //this is because of a weird bug. Easier to do this than figure out why
-            mouseY = StdDraw.mouseX(); //Doesn't really affect anything as long as they're flipped like this
+           mouseX = StdDraw.mouseY(); //this is because of a weird bug. Easier to do this than figure out why
+           mouseY = StdDraw.mouseX(); //Doesn't really affect anything as long as they're flipped like this
 
-            if(blackWins || redWins) {
-                StdDraw.setPenColor(transparent);
-                StdDraw.filledRectangle(300,350,300,350);
-                StdDraw.filledRectangle(300,350,300,350);
-                StdDraw.filledRectangle(300,350,300,350);
-                StdDraw.setPenColor(StdDraw.WHITE);
-                StdDraw.filledRectangle(300,300,125,60);
-                if (blackWins) {
-                    StdDraw.setPenColor(StdDraw.BLACK);
-                    StdDraw.setFont(title);
-                    StdDraw.text(300,297,"Black wins!");
-                } else if (redWins) {
-                    StdDraw.setPenColor(StdDraw.RED);
-                    StdDraw.setFont(title);
-                    StdDraw.text(300,297,"Red wins!");
-                }
-                //noinspection StatementWithEmptyBody
-                while (true){ } //prevent GUI from being interacted with after a win is detected
-            }
+           if(blackWins || redWins) {
+               screenTint();
+               StdDraw.setPenColor(StdDraw.WHITE);
+               StdDraw.filledRectangle(300,300,125,60);
+               if (blackWins) {
+                   StdDraw.setPenColor(StdDraw.BLACK);
+                   StdDraw.setFont(title);
+                   StdDraw.text(300,297,"Black wins!");
+               } else if (redWins) {
+                   StdDraw.setPenColor(StdDraw.RED);
+                   StdDraw.setFont(title);
+                   StdDraw.text(300,297,"Red wins!");
+               }
+               while (true){ } //prevent GUI from being interacted with after a win is detected
+           }
 
             //new frame
             StdDraw.show();
@@ -259,10 +262,17 @@ public class GUI extends backend {
         StdDraw.picture(xIn,yIn+1,"rking.png"); //black outline of crown
         StdDraw.picture(xIn,yIn,"king.png",67,67);
     }
-    public static void backendRun(){
+    public static void backendRun(int mode){
         Thread backendGo = new Thread(() -> {
-            String[] dummy = new String[3]; //because backend depends on an input string[]
-            backend.main(dummy);
+            String[] args = new String[1];
+            if(mode == 0){
+                args[0] = "single";
+            } else if(mode == 1){
+                args[0] = "multi";
+            } else if(mode == 2){
+                args[0] = "tobenamed";
+            }
+            backend.main(args);
         }
         );
         backendGo.start(); //runs backend (this will be replaced as it doesn't let GUI interact with backend. just passive for now)
@@ -274,5 +284,34 @@ public class GUI extends backend {
         }
         );
         watchdogGo.start(); //runs backend (this will be replaced as it doesn't let GUI interact with backend. just passive for now)
+    }
+    static void boardBG(double xGuiPos, double yGuiPos){
+        //resources for drawing board
+        boolean altColor = false; //switches colors when drawing rectangles
+        for(int i=0; i<10; i++){
+            for(int j=0; j<10; j++) {
+                StdDraw.filledRectangle(xGuiPos, yGuiPos, 37.5, 37.5);
+                if (altColor) {
+                    StdDraw.setPenColor(StdDraw.BOOK_RED); //COLORS NOT FINAL
+                } else {
+                    StdDraw.setPenColor(StdDraw.ORANGE);
+                }
+                altColor = !altColor;
+                xGuiPos += 75;
+            }
+            yGuiPos += 75;
+            xGuiPos = -37.5;
+            altColor = !altColor;
+        }
+        StdDraw.setPenColor(StdDraw.BLACK);
+        StdDraw.filledRectangle(300, 602.5, 300, 2.5);
+        StdDraw.setPenColor(57, 191, 182);
+        StdDraw.filledRectangle(300,630,300,25);
+    }
+    static void screenTint(){
+        StdDraw.setPenColor(transparent);
+        for(int i=0; i<6; i++) {
+            StdDraw.filledRectangle(300, 350, 300, 350);
+        }
     }
 }
