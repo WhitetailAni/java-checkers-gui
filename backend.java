@@ -53,6 +53,8 @@ public class backend {
 
     public static void main(String[] args) throws NumberFormatException {
 
+        waitForUnclick();
+
         //credits
         System.out.println("Checkers, written in Java, made by WhitetailAni");
         System.out.println("Copyright (c) 2023 WhitetailAni under the MIT license");
@@ -682,14 +684,14 @@ public class backend {
         }  //this was originally an equation but it had weird edge cases. This is longer but more reliable
         return yOut;
     }
-    static void waitForClick(){
+    public static void waitForClick(){
         while (true) {
             if (StdDraw.isMousePressed()) {
                 break;
             }
         }
     }
-    static void waitForUnclick(){
+    public static void waitForUnclick(){
         while (true) {
             if (!StdDraw.isMousePressed()) {
                 break;

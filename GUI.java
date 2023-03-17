@@ -22,6 +22,7 @@ public class GUI extends backend {
 
         //resources for title bar
         Font title = new Font("Sans Serif", Font.BOLD, 30);
+        Font intro = new Font("Sans Serif", Font.PLAIN, 25);
         Font alert = new Font("Sans Serif", Font.BOLD, 20);
         Font captured = new Font("Helvetica", Font.BOLD, 15);
         Font inBetween = new Font("Sans Serif", Font.BOLD, 25);
@@ -31,37 +32,95 @@ public class GUI extends backend {
 
 
         //intro loop
+        intro:
         while (true) {
             //show board then darken it
             boardBG(xGuiPos, yGuiPos);
             screenTint();
-
-            //mode select screen
             StdDraw.setPenColor(StdDraw.WHITE);
             StdDraw.filledRectangle(300,300,225,150);
             StdDraw.setPenColor(StdDraw.BLACK);
-            StdDraw.setFont(alert);
-            StdDraw.filledRectangle(300,190,225,2.5);
-            StdDraw.text(300,167.5,"Quit");
-            if((450 >= mouseX && mouseX >= 150)){
-                System.exit(0);
-            }
+            StdDraw.setFont(new Font("Source Sans Pro", Font.PLAIN, 38));
+            StdDraw.picture(227.5,410,"java.png",96,60);
+            StdDraw.text(335,406,"checkers");
+            StdDraw.setFont(new Font("Source Sans Pro", Font.PLAIN, 25));
+            StdDraw.text(300,375,"by WhitetailAni");
+            StdDraw.setFont(intro);
+            StdDraw.filledRectangle(300,350,225,2.5);
+            StdDraw.text(300, 330, "Singleplayer");
+            StdDraw.setFont(new Font("Source Sans Pro", Font.PLAIN, 15));
+            StdDraw.text(300,315,"Not Yet Available");
+            StdDraw.setFont(new Font("Source Sans Pro", Font.PLAIN, 25));
+            StdDraw.filledRectangle(300,300,225,2.5);
+            StdDraw.text(300,272.5,"Multiplayer");
+            StdDraw.filledRectangle(300,250,225,2.5);
+            StdDraw.text(300,222.5,"Rules");
+            StdDraw.filledRectangle(300,200,225,2.5);
+            StdDraw.text(300,172.5,"Quit");
             StdDraw.show();
             StdDraw.pause((int) (timeElapsed * 1000));
             StdDraw.clear();
-            try {
-                Thread.sleep(200000);
+            while (true) {
+                mouseX = StdDraw.mouseY();
+                mouseY = StdDraw.mouseX();
+                if (StdDraw.isMousePressed() && (450 >= mouseY && mouseY >= 150) && (350 >= mouseX && mouseX >= 300)) {
+                    System.out.println("single player");
+                    /*backendRun(0);
+                    waitForUnclick();
+                    break intro;*/
+                }
+                if (StdDraw.isMousePressed() && (450 >= mouseY && mouseY >= 150) && (300 >= mouseX && mouseX >= 250)) {
+                    System.out.println("multi player");
+                    backendRun(1);
+                    waitForUnclick();
+                    break intro;
+                }
+                if (StdDraw.isMousePressed() && (450 >= mouseY && mouseY >= 150) && (250 >= mouseX && mouseX >= 200)) {
+                    System.out.println("rules");
+                    boardBG(xGuiPos, yGuiPos);
+                    StdDraw.setFont(new Font("Source Sans Pro", Font.PLAIN, 25));
+                    screenTint();
+                    StdDraw.setPenColor(StdDraw.WHITE);
+                    StdDraw.filledRectangle(300, 300, 225, 150);
+                    StdDraw.setPenColor(StdDraw.BLACK);
+                    StdDraw.setFont(new Font("Source Sans Pro", Font.PLAIN, 38));
+                    StdDraw.picture(187.5,410,"java.png",96,60);
+                    StdDraw.text(295,406,"checkers");
+                    StdDraw.setFont(new Font("Source Sans Pro", Font.PLAIN, 25));
+                    StdDraw.text(260,375,"by WhitetailAni");
+                    StdDraw.setFont(new Font("Source Sans Pro", Font.PLAIN, 35));
+                    StdDraw.text(435,395,"back");
+                    StdDraw.setFont(new Font("Sans Serif", Font.PLAIN, 20));
+                    StdDraw.filledRectangle(300,350,225,2.5);
+                    StdDraw.text(300, 332.5, "1. Select your chosen method of play.");
+                    StdDraw.text(300,312.5,"(currently only multiplayer is available)");
+                    StdDraw.text(300,287.5,"2. When it is your turn, use your mouse to");
+                    StdDraw.text(300,267.5,"select the piece you would like to move.");
+                    StdDraw.text(300,242.5,"3. Then select the destination square.");
+                    StdDraw.text(300,217.5,"4. Pay attention to the bar at the top");
+                    StdDraw.text(300,197.5,"for any other information.");
+                    StdDraw.text(300,172.5,"5. Have fun!");
+                    StdDraw.show();
+                    while (true){
+                        mouseX = StdDraw.mouseX();
+                        mouseY = StdDraw.mouseY();
+                        if (StdDraw.isMousePressed() && (410 >= mouseY && mouseY >= 380) && (460 >= mouseX && mouseX >= 400)) {
+                            System.out.println("back");
+                            waitForUnclick();
+                            break;
+                        }
+                    }
+                }
+                if (StdDraw.isMousePressed() && (450 >= mouseY && mouseY >= 150) && (200 >= mouseX && mouseX >= 150)){
+                    System.out.println("quit");
+                    System.exit(0);
+                }
+                break;
             }
-            catch(InterruptedException ignored) { }
-            break;
         }
-        backendRun(1);
 
         //gameloop
         while (true) {
-
-            //this has to be in the while loop
-
             StdDraw.setPenColor(customRed);
             //set up board background
             boardBG(xGuiPos, yGuiPos);
@@ -269,8 +328,6 @@ public class GUI extends backend {
                 args[0] = "single";
             } else if(mode == 1){
                 args[0] = "multi";
-            } else if(mode == 2){
-                args[0] = "tobenamed";
             }
             backend.main(args);
         }
