@@ -68,6 +68,7 @@ public class GUI extends backend {
                     /*backendRun(0);
                     waitForUnclick();
                     break intro;*/
+                    //uncomment this when AI is done
                 }
                 if (StdDraw.isMousePressed() && (450 >= mouseY && mouseY >= 150) && (300 >= mouseX && mouseX >= 250)) {
                     System.out.println("multi player");
@@ -119,7 +120,7 @@ public class GUI extends backend {
             }
         }
 
-        //gameloop
+        //game loop
         while (true) {
             StdDraw.setPenColor(customRed);
             //set up board background
@@ -240,6 +241,7 @@ public class GUI extends backend {
                 System.out.println("MouseX is at " + mouseY);
                 System.out.println("MouseY is at " + mouseX);
             }*/
+            //prints out mouseX and mouseY for debugging. leave disabled unless you need it!
 
             //update state of checkerboard
             for (int i=0; i<CheckerBoard.length; i++) {
@@ -268,24 +270,25 @@ public class GUI extends backend {
                 StdDraw.picture(xConversionTherapy(ySel),yConversionTherapy(xSel)-king, "crosshair.png",xScale,yScale);
             }
 
-           mouseX = StdDraw.mouseY(); //this is because of a weird bug. Easier to do this than figure out why
-           mouseY = StdDraw.mouseX(); //Doesn't really affect anything as long as they're flipped like this
+            mouseX = StdDraw.mouseY(); //this is because with the backend, I accidentally set up the y-axis as X and the x-axis as Y.
+            mouseY = StdDraw.mouseX(); //I figured this out way too late to fix it without spending weeks bugfixing, so I'm left to deal with it
+            //everything mostly functions.
 
-           if(blackWins || redWins) {
-               screenTint();
-               StdDraw.setPenColor(StdDraw.WHITE);
-               StdDraw.filledRectangle(300,300,125,60);
-               if (blackWins) {
-                   StdDraw.setPenColor(StdDraw.BLACK);
-                   StdDraw.setFont(title);
-                   StdDraw.text(300,297,"Black wins!");
-               } else if (redWins) {
-                   StdDraw.setPenColor(StdDraw.RED);
-                   StdDraw.setFont(title);
-                   StdDraw.text(300,297,"Red wins!");
-               }
-               while (true){ } //prevent GUI from being interacted with after a win is detected
-           }
+            if(blackWins || redWins) {
+                screenTint();
+                StdDraw.setPenColor(StdDraw.WHITE);
+                StdDraw.filledRectangle(300,300,125,60);
+                if (blackWins) {
+                    StdDraw.setPenColor(StdDraw.BLACK);
+                    StdDraw.setFont(title);
+                    StdDraw.text(300,297,"Black wins!");
+                } else if (redWins) {
+                    StdDraw.setPenColor(StdDraw.RED);
+                    StdDraw.setFont(title);
+                    StdDraw.text(300,297,"Red wins!");
+                }
+                while (true){ } //prevent GUI from being interacted with after a win is detected
+            }
 
             //new frame
             StdDraw.show();
@@ -332,15 +335,13 @@ public class GUI extends backend {
             backend.main(args);
         }
         );
-        backendGo.start(); //runs backend (this will be replaced as it doesn't let GUI interact with backend. just passive for now)
+        backendGo.start(); //runs backend
+        //was going to replace it, but using inheritance everything works out.
+        //is it the best solution? not really, but it works
     }
     public static void watchdogRun(){
-        Thread watchdogGo = new Thread(() -> {
-            String[] dummy = new String[3]; //because backend depends on an input string[]
-            watchdog.main(dummy);
-        }
-        );
-        watchdogGo.start(); //runs backend (this will be replaced as it doesn't let GUI interact with backend. just passive for now)
+        Thread watchdogGo = new Thread(watchdog::main);
+        watchdogGo.start(); //runs watchdog
     }
     static void boardBG(double xGuiPos, double yGuiPos){
         //resources for drawing board
