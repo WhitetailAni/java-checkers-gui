@@ -159,6 +159,9 @@ public class GUI extends backend {
                         StdDraw.setFont(alert);
                         StdDraw.text(300, 638, "You can't move");
                         StdDraw.text(300, 617, "an empty space!");
+                    } else if (blackWon(CheckerBoard)) {
+                        StdDraw.setFont(title);
+                        StdDraw.text(300, 625, "BLACK has won the game");
                     } else {
                         StdDraw.setFont(title);
                         StdDraw.text(300, 625, "It is BLACK's turn");
@@ -186,6 +189,9 @@ public class GUI extends backend {
                         StdDraw.setFont(alert);
                         StdDraw.text(300, 638, "You can't move");
                         StdDraw.text(300, 617, "an empty space!");
+                    } else if (redWon(CheckerBoard)) {
+                        StdDraw.setFont(title);
+                        StdDraw.text(300, 625, "RED has won the game");
                     } else {
                         StdDraw.setFont(title);
                         StdDraw.text(300, 625, "It is RED's turn");
@@ -274,20 +280,19 @@ public class GUI extends backend {
             mouseY = StdDraw.mouseX(); //I figured this out way too late to fix it without spending weeks bugfixing, so I'm left to deal with it
             //everything mostly functions.
 
-            if(blackWins || redWins) {
+            if(blackWon(CheckerBoard) || redWon(CheckerBoard)) {
                 screenTint();
                 StdDraw.setPenColor(StdDraw.WHITE);
                 StdDraw.filledRectangle(300,300,125,60);
-                if (blackWins) {
+                if (blackWon(CheckerBoard)) {
                     StdDraw.setPenColor(StdDraw.BLACK);
                     StdDraw.setFont(title);
                     StdDraw.text(300,297,"Black wins!");
-                } else if (redWins) {
+                } else if (redWon(CheckerBoard)) {
                     StdDraw.setPenColor(StdDraw.RED);
                     StdDraw.setFont(title);
                     StdDraw.text(300,297,"Red wins!");
                 }
-                while (true){ } //prevent GUI from being interacted with after a win is detected
             }
 
             //new frame
@@ -340,7 +345,9 @@ public class GUI extends backend {
         //is it the best solution? not really, but it works
     }
     public static void watchdogRun(){
-        Thread watchdogGo = new Thread(watchdog::main);
+        Thread watchdogGo = new Thread(() -> {
+            watchdog.main();
+        });
         watchdogGo.start(); //runs watchdog
     }
     static void boardBG(double xGuiPos, double yGuiPos){

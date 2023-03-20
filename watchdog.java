@@ -1,7 +1,7 @@
 public class watchdog extends GUI {
 
     //resets alerts so alertBoard doesn't get stuck
-    public static void main(String[] args) {
+    public static void main() {
         try{
             if (moveBlack) {
                 Thread.sleep(10000);

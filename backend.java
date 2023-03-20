@@ -67,7 +67,7 @@ public class backend {
         System.out.println(ANSI_REDBG + ANSI_BLACK + "4 = red king" + ANSI_RESET);
 
         //setup board, topside
-        for (int i = 0; i < 3; i++) {
+        /*for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 7; j++) {
                 if (i == 0 || i == 2) {
                     if (j % 2 == 0) {
@@ -105,8 +105,14 @@ public class backend {
         }
         CheckerBoard[0][7] = 2; //fix for a weird bug
         CheckerBoard[2][7] = 2;
-        CheckerBoard[6][7] = 1;
+        CheckerBoard[6][7] = 1;*/
 
+        CheckerBoard[0][1] = 4;
+        CheckerBoard[0][5] = 4;
+        CheckerBoard[5][6] = 4;
+        CheckerBoard[1][2] = 1;
+        redCaptured = 11;
+        blackCaptured = 9;
 
         //checkers managing
         boolean multiturn; //used to determine if the player can take another turn or not (only used if a piece was jumped)
@@ -144,7 +150,7 @@ public class backend {
                                     System.out.println("Cheat mode toggled");
                                     selectPiece = false;
                                     cheatModeBlack = !cheatModeBlack;
-                                } else if (mouseY > 600) { //http://cydia.thanos.lol } else if (CheckerBoard[xSel][ySel] == 2 || CheckerBoard[xSel][ySel] == 4) {
+                                } else if (mouseY > 600) { /*http://cydia.thanos.lol*/ } else if (CheckerBoard[xSel][ySel] == 2 || CheckerBoard[xSel][ySel] == 4) {
                                     System.out.println("You can't move RED's pieces!");
                                     selectPiece = false;
                                     emptyBlack = false;
@@ -168,9 +174,7 @@ public class backend {
                         pieceMoveBlack:
                         while (true) { //pieceMoveBlack, destination select and jump loop
                             if (ySel <= 1) {
-                                if (!(xSel <= 1) //the piece is not in a corner (fixes out of bounds)
-                                        && //AND
-                                    (CheckerBoard[xSel - 1][ySel + 1] == 2 || CheckerBoard[xSel - 1][ySel + 1] == 4) //there is a jumpable piece that is RED's
+                                if (!(xSel <= 1) && (CheckerBoard[xSel - 1][ySel + 1] == 2 || CheckerBoard[xSel - 1][ySel + 1] == 4) //there is a jumpable piece that is RED's
                                         && //AND
                                     (CheckerBoard[xSel - 2][ySel + 2] == 0 || cheatModeBlack)) //the destination if the piece is jumped is open
                                 {
@@ -256,7 +260,7 @@ public class backend {
                                     xSel = xSel + 2;
                                     ySel = ySel + 2;
                                     break pieceMoveBlack;
-                                } else if ((CheckerBoard[xSel][ySel] == 3 && !(xSel >= 6 || xSel <= 1)) && ((CheckerBoard[xSel + 1][ySel - 1] == 2 || CheckerBoard[xSel + 1][ySel - 1] == 4) && (CheckerBoard[xSel + 2][ySel - 2] == 0 || cheatModeBlack))) {
+                                } else if ((CheckerBoard[xSel][ySel] == 3 && !(xSel >= 6)) && ((CheckerBoard[xSel + 1][ySel - 1] == 2 || CheckerBoard[xSel + 1][ySel - 1] == 4) && (CheckerBoard[xSel + 2][ySel - 2] == 0 || cheatModeBlack))) {
                                     System.out.println("You must make a forced jump");
                                     CheckerBoard[xSel + 2][ySel - 2] = CheckerBoard[xSel][ySel];
                                     CheckerBoard[xSel + 1][ySel - 1] = 0;
@@ -468,7 +472,7 @@ public class backend {
                                     xSel = xSel + 2;
                                     ySel = ySel - 2;
                                     break pieceMoveRed;
-                                } else if ((CheckerBoard[xSel][ySel] == 4 && !(xSel >= 6)) && ((CheckerBoard[xSel - 1][ySel + 1] == 1 || CheckerBoard[xSel - 1][ySel + 1] == 3) && (CheckerBoard[xSel - 2][ySel + 2] == 0 || cheatModeRed))) {
+                                } else if (!(xSel >= 6) && (CheckerBoard[xSel][ySel] == 4) && ((CheckerBoard[xSel - 1][ySel + 1] == 1 || CheckerBoard[xSel - 1][ySel + 1] == 3) && (CheckerBoard[xSel - 2][ySel + 2] == 0 || cheatModeRed))) {
                                     System.out.println("You must make a forced jump");
                                     CheckerBoard[xSel - 2][ySel + 2] = CheckerBoard[xSel][ySel];
                                     CheckerBoard[xSel - 1][ySel + 1] = 0;
@@ -570,10 +574,8 @@ public class backend {
 
         //endgame.
         if(blackWon(CheckerBoard)){
-            blackWins = true;
             System.out.println("Black has won the game");
         } else if(redWon(CheckerBoard)){
-            redWins = true;
             System.out.println("Red has won the game");
         } else {
             System.out.println("e");
