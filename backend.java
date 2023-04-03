@@ -107,13 +107,6 @@ public class backend {
         CheckerBoard[2][7] = 2;
         CheckerBoard[6][7] = 1;
 
-        CheckerBoard[0][1] = 4;
-        CheckerBoard[0][5] = 4;
-        CheckerBoard[5][6] = 4;
-        CheckerBoard[1][2] = 1;
-        redCaptured = 11;
-        blackCaptured = 9;
-
         //checkers managing
         boolean multiturn; //used to determine if the player can take another turn or not (only used if a piece was jumped)
         boolean errorCheck;
