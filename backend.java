@@ -67,7 +67,7 @@ public class backend {
         System.out.println(ANSI_REDBG + ANSI_BLACK + "4 = red king" + ANSI_RESET);
 
         //setup board, topside
-        /*for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 7; j++) {
                 if (i == 0 || i == 2) {
                     if (j % 2 == 0) {
@@ -105,7 +105,7 @@ public class backend {
         }
         CheckerBoard[0][7] = 2; //fix for a weird bug
         CheckerBoard[2][7] = 2;
-        CheckerBoard[6][7] = 1;*/
+        CheckerBoard[6][7] = 1;
 
         CheckerBoard[0][1] = 4;
         CheckerBoard[0][5] = 4;
